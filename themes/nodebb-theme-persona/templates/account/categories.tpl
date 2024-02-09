@@ -3,7 +3,7 @@
 
     <div class="row">
         <h1>{title}</h1>
-        <div class="col-lg-12">
+    <div class="col-lg-12">
             <div class="btn-group bottom-sheet" component="category/watch/all">
                 <button class="btn btn-default dropdown-toggle" data-toggle="dropdown" type="button">
                     <span>[[user:change_all]]</span>
@@ -26,3 +26,7 @@
         </div>
     </div>
 </div>
+
+
+
+

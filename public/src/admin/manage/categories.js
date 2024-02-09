@@ -87,6 +87,8 @@ define('admin/manage/categories', [
             el.find('i').toggleClass('fa-chevron-down', expand).toggleClass('fa-chevron-right', !expand);
             el.closest('[data-cid]').find('> ul[data-cid]').toggleClass('hidden', !expand);
         }
+        // Robert - function for searching general discussion
+        handleCategorySearch();
     };
 
     Categories.throwCreateModal = function () {
@@ -298,6 +300,17 @@ define('admin/manage/categories', [
                 });
             });
         }
+    }
+
+    function handleCategorySearch() {
+        // make a function that takes an input from the form from category.tpl (the form that searches discussion")
+        // this is to test if the function is working, here is the full form code from category.tpl:
+
+        // this is the function that takes the input from the form and prints it out on the console
+        $('#search-discussion').on('input', function () {
+            console.log("Hello World");
+            console.log($(this).val());
+        });
     }
 
     return Categories;
