@@ -5,6 +5,18 @@
     {{{end}}}
 </div>
 <div class="row">
+
+   <!-- This is the search bar for the posts - Robert - Sprint 1 -->
+    <div class="col-lg-3 col-xs-9">
+        <div class="search">
+                <div class="input-group">
+                    <input class="form-control" id="search-discussion" type="text" placeholder="Search within discussion"/>
+                    <span class="input-group-addon">
+                        <i component="user/search/icon" class="fa fa-search"></i>
+                    </span>
+                </div>
+            </div>
+    </div>
     <div class="category <!-- IF widgets.sidebar.length -->col-lg-9 col-sm-12<!-- ELSE -->col-lg-12<!-- ENDIF widgets.sidebar.length -->">
         <!-- IMPORT partials/category/subcategory.tpl -->
 
@@ -18,17 +30,7 @@
                 <!-- ENDIF privileges.topics:create -->
 
 
-                  <!-- This is the search bar for the posts - Robert - Sprint 1 -->
-                <div class="col-lg-3 col-xs-9">
-                    <div class="search">
-                        <div class="input-group">
-                            <input class="form-control" id="search-discussion" type="text" placeholder="Search within discussion"/>
-                            <span class="input-group-addon">
-                                <i component="user/search/icon" class="fa fa-search"></i>
-                            </span>
-                        </div>
-                    </div>
-                </div>
+               
             <a href="{url}" class="inline-block">
                 <div class="alert alert-warning hide" id="new-topics-alert"></div>
             </a>
