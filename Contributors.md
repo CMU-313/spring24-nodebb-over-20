@@ -117,7 +117,7 @@
                     <tr>
                     <tr>
                         <th align="left">
-                            Comments: 1
+                            Comments: 2
                         </th>
                     <tr>
                 </table>
