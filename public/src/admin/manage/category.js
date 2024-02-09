@@ -230,6 +230,10 @@ define('admin/manage/category', [
                 $this.attr('data-disabled', disabled ? 0 : 1);
             }).catch(alerts.error);
         });
+
+        // Robert - function for searching general discussion
+        handleCategorySearch();
+        
     };
 
     function modified(el) {
@@ -280,6 +284,18 @@ define('admin/manage/category', [
             modified(tagEl);
         });
     }
+
+    function handleCategorySearch() {
+        // make a function that takes an input from the form from category.tpl (the form that searches discussion")
+        // this is to test if the function is working, here is the full form code from category.tpl:
+
+        // this is the function that takes the input from the form and prints it out on the console
+        $('#search-discussion').on('input', function () {
+            console.log("Hello World");
+            console.log($(this).val());
+        });
+    }
+
 
     Category.launchParentSelector = function () {
         categorySelector.modal({
