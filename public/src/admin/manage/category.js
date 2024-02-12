@@ -233,7 +233,6 @@ define('admin/manage/category', [
 
         // Robert - function for searching general discussion
         handleCategorySearch();
-        
     };
 
     function modified(el) {

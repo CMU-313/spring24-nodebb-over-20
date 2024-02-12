@@ -9,13 +9,27 @@
    <!-- This is the search bar for the posts - Robert - Sprint 1 -->
     <div class="col-lg-3 col-xs-9">
         <div class="search">
-                <div class="input-group">
-                    <input class="form-control" id="search-discussion" type="text" placeholder="Search within discussion"/>
-                    <span class="input-group-addon">
-                        <i component="user/search/icon" class="fa fa-search"></i>
-                    </span>
-                </div>
-            </div>
+        <div class="input-group">
+            <input class="form-control" id="search-discussion" type="text" placeholder="Search within discussion"/>
+            <span class="input-group-addon">
+                <i component="user/search/icon" class="fa fa-search"></i>
+            </span>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Get the search input element
+            var searchInput = document.getElementById("search-discussion");
+
+            // Add event listener for input event
+            searchInput.addEventListener("input", function() {
+                // Log the input value to the console
+                console.log("Typed text:", searchInput.value);
+            });
+        });
+    </script>
+
     </div>
     <div class="category <!-- IF widgets.sidebar.length -->col-lg-9 col-sm-12<!-- ELSE -->col-lg-12<!-- ENDIF widgets.sidebar.length -->">
         <!-- IMPORT partials/category/subcategory.tpl -->
