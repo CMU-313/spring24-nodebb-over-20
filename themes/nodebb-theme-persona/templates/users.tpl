@@ -6,6 +6,7 @@
     {{{end}}}
 </div>
 <div class="users">
+   
     <div class="row">
         <div class="col-lg-6">
         <!-- IMPORT partials/users_list_menu.tpl -->

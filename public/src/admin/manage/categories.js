@@ -87,6 +87,7 @@ define('admin/manage/categories', [
             el.find('i').toggleClass('fa-chevron-down', expand).toggleClass('fa-chevron-right', !expand);
             el.closest('[data-cid]').find('> ul[data-cid]').toggleClass('hidden', !expand);
         }
+        
     };
 
     Categories.throwCreateModal = function () {
@@ -299,6 +300,8 @@ define('admin/manage/categories', [
             });
         }
     }
+
+   
 
     return Categories;
 });
