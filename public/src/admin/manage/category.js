@@ -1,5 +1,7 @@
 'use strict';
 
+const posts = require("../../../src/posts");
+const winston = require("winston");
 define('admin/manage/category', [
     'uploader',
     'iconSelect',
@@ -290,8 +292,11 @@ define('admin/manage/category', [
 
         // this is the function that takes the input from the form and prints it out on the console
         $('#search-discussion').on('input', function () {
-            console.log("Hello World");
-            console.log($(this).val());
+            // console.log("Hello World");
+            // console.log($(this).val());
+            // TODO Find out how to print this out properly
+            console.log(posts.getPidsByContent($(this).val()))
+            winston.info("Hello World")
         });
     }
 
