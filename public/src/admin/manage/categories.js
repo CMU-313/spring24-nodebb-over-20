@@ -1,5 +1,6 @@
 'use strict';
 
+
 define('admin/manage/categories', [
     'translator',
     'benchpress',
@@ -300,8 +301,6 @@ define('admin/manage/categories', [
             });
         }
     }
-
-   
 
     return Categories;
 });

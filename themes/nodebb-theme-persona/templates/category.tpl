@@ -3,34 +3,41 @@
     {{{each widgets.header}}}
     {{widgets.header.html}}
     {{{end}}}
-</div>
-<div class="row">
-
-   <!-- This is the search bar for the posts - Robert - Sprint 1 -->
-    <div class="col-lg-3 col-xs-9">
-        <div class="search">
-        <div class="input-group">
-            <input class="form-control" id="search-discussion" type="text" placeholder="Search within discussion"/>
-            <span class="input-group-addon">
-                <i component="user/search/icon" class="fa fa-search"></i>
-            </span>
-        </div>
-    </div>
+    
+    <style>
+        .search {
+            width: 25%; /* Set the width to a fourth of its original size */
+            margin-left: 10px; /* Adjust the left margin */
+        }
+    </style>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            // Get the search input element
-            var searchInput = document.getElementById("search-discussion");
+        // Check if it's the General Category Page by matching category ID
+        if (ajaxify.data.slug === '2/general-discussion') {
+            // Create search bar
+            var searchBar = document.createElement("div");
+            searchBar.className = "search";
+            searchBar.innerHTML = `
+                <div class="input-group">
+                    <input class="form-control" id="search-discussion" type="text" placeholder="Search within discussion"/>
+                    <span class="input-group-addon">
+                        <i component="user/search/icon" class="fa fa-search"></i>
+                    </span>
+                </div>
+            `;
+            // Append search bar to the header
+            document.querySelector('[data-widget-area="header"]').appendChild(searchBar);
 
             // Add event listener for input event
-            searchInput.addEventListener("input", function() {
-                // Log the input value to the console
-                console.log("Typed text:", searchInput.value);
+            document.addEventListener("input", function(event) {
+                if (event.target.id === "search-discussion") {
+                    console.log("Typed text:", event.target.value);
+                }
             });
-        });
+        }
     </script>
-
-    </div>
+</div>
+<div class="row">
     <div class="category <!-- IF widgets.sidebar.length -->col-lg-9 col-sm-12<!-- ELSE -->col-lg-12<!-- ENDIF widgets.sidebar.length -->">
         <!-- IMPORT partials/category/subcategory.tpl -->
 
@@ -43,12 +50,9 @@
                 <!-- ENDIF !loggedIn -->
                 <!-- ENDIF privileges.topics:create -->
 
-
-               
             <a href="{url}" class="inline-block">
                 <div class="alert alert-warning hide" id="new-topics-alert"></div>
             </a>
-
 
             <span class="pull-right" component="category/controls">
                 <!-- IMPORT partials/category/watch.tpl -->
@@ -56,7 +60,6 @@
                 <!-- IMPORT partials/category/tools.tpl -->
             </span>
         </div>
-
 
         <!-- IF !topics.length -->
         <!-- IF privileges.topics:create -->

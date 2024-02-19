@@ -11,12 +11,17 @@ define('admin/manage/category', [
 ], function (uploader, iconSelect, categorySelector, Benchpress, api, bootbox, alerts) {
     const Category = {};
     let updateHash = {};
+   
 
     Category.init = function () {
         $('#category-settings select').each(function () {
             const $this = $(this);
             $this.val($this.attr('data-value'));
+            console.log("This is the correct page");
         });
+        // // Robert - adding functions that routes
+        // Category.handleSearch();
+
 
         categorySelector.init($('[component="category-selector"]'), {
             onSelect: function (selectedCategory) {
@@ -24,6 +29,7 @@ define('admin/manage/category', [
             },
             showLinks: true,
         });
+
 
         handleTags();
 
@@ -231,10 +237,27 @@ define('admin/manage/category', [
             }).catch(alerts.error);
         });
 
-        // Robert - function for searching general discussion
-        handleCategorySearch();
+        // // Robert - function for searching general discussion
+        // handleCategorySearch();
     };
 
+    // Category.handleSearch = function (params) {
+    //     searchResultCount = params && params.resultCount;
+    //     console.log("Search is active");
+    //     $('#search-discussion').on('keyup', utils.debounce(doDiscSearch, 250));
+    //     $('.search select, .search input[type="checkbox"]').on('change', doDiscSearch);
+    // };
+    // function doDiscSearch() {
+    //     console.log("It got to here")
+    //     if (!ajaxify.data.template.users) {
+    //         return;
+    //     }
+    //     console.log("Doing search")
+    //     $('[component="user/search/icon"]').removeClass('fa-search').addClass('fa-spinner fa-spin');
+    //     const searchPrompt = $('#search-discussion').val();
+    //     const activeSection = getActiveSection();
+    //     console.log(searchPrompt);
+    // };
     function modified(el) {
         let value;
         if ($(el).is(':checkbox')) {
