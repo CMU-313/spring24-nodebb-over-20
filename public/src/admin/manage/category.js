@@ -20,7 +20,7 @@ define('admin/manage/category', [
             console.log("This is the correct page");
         });
         // // Robert - adding functions that routes
-        // Category.handleSearch();
+        Category.handleSearch();
 
 
         categorySelector.init($('[component="category-selector"]'), {
@@ -238,26 +238,28 @@ define('admin/manage/category', [
         });
 
         // // Robert - function for searching general discussion
-        // handleCategorySearch();
+        handleCategorySearch();
     };
 
-    // Category.handleSearch = function (params) {
-    //     searchResultCount = params && params.resultCount;
-    //     console.log("Search is active");
-    //     $('#search-discussion').on('keyup', utils.debounce(doDiscSearch, 250));
-    //     $('.search select, .search input[type="checkbox"]').on('change', doDiscSearch);
-    // };
-    // function doDiscSearch() {
-    //     console.log("It got to here")
-    //     if (!ajaxify.data.template.users) {
-    //         return;
-    //     }
-    //     console.log("Doing search")
-    //     $('[component="user/search/icon"]').removeClass('fa-search').addClass('fa-spinner fa-spin');
-    //     const searchPrompt = $('#search-discussion').val();
-    //     const activeSection = getActiveSection();
-    //     console.log(searchPrompt);
-    // };
+    Category.handleSearch = function (params) {
+        searchResultCount = params && params.resultCount;
+        console.log("Search is active");
+        $('#search-discussion').on('keyup', utils.debounce(doDiscSearch, 250));
+        $('.search select, .search input[type="checkbox"]').on('change', doDiscSearch);
+    };
+    function doDiscSearch() {
+        console.log("It got to here")
+        // if (!ajaxify.data.template.users) {
+        //     return;
+        // }
+        console.log("Doing search in the correct place")
+        $('[component="user/search/icon"]').removeClass('fa-search').addClass('fa-spinner fa-spin');
+        const searchPrompt = $('#search-discussion').val();
+        const activeSection = getActiveSection();
+        console.log(searchPrompt);
+    };
+
+
     function modified(el) {
         let value;
         if ($(el).is(':checkbox')) {

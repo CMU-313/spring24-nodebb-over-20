@@ -4,13 +4,16 @@
     {{widgets.header.html}}
     {{{end}}}
     
+    <!-- Robert's Part fore now -->
+    <!-- Stlying for the searchbar - margin to the right -->
     <style>
         .search {
             width: 25%; /* Set the width to a fourth of its original size */
-            margin-left: 10px; /* Adjust the left margin */
+            margin-right: 10px; /* Adjust the right margin */
         }
     </style>
 
+    <!-- The script that identifies the slug and makes the search bar -->
     <script>
         // Check if it's the General Category Page by matching category ID
         if (ajaxify.data.slug === '2/general-discussion') {
@@ -37,6 +40,8 @@
         }
     </script>
 </div>
+
+<!-- Rest of the code -->
 <div class="row">
     <div class="category <!-- IF widgets.sidebar.length -->col-lg-9 col-sm-12<!-- ELSE -->col-lg-12<!-- ENDIF widgets.sidebar.length -->">
         <!-- IMPORT partials/category/subcategory.tpl -->
