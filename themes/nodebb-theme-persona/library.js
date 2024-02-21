@@ -86,6 +86,7 @@ library.getThemeConfig = async function (config) {
     return config;
 };
 
+//I think this is where the data is being passed to topic template
 library.addUserToTopic = async function (hookData) {
     const settings = await meta.settings.get('persona');
     if (settings.enableQuickReply === 'on') {
