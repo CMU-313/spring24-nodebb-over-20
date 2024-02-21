@@ -1,5 +1,6 @@
 'use strict';
 
+
 define('admin/manage/categories', [
     'translator',
     'benchpress',
@@ -15,6 +16,8 @@ define('admin/manage/categories', [
     let sortables;
 
     Categories.init = function () {
+
+        console.log("entered  categories.js file")
         categorySelector.init($('.category [component="category-selector"]'), {
             parentCid: ajaxify.data.selectedCategory ? ajaxify.data.selectedCategory.cid : 0,
             onSelect: function (selectedCategory) {
@@ -300,8 +303,6 @@ define('admin/manage/categories', [
             });
         }
     }
-
-   
 
     return Categories;
 });

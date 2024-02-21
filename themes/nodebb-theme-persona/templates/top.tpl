@@ -14,6 +14,35 @@
             <!-- ENDIF loggedIn -->
         </div>
 
+           <!-- This is the search bar for the posts - Robert - Sprint 1 -->
+        {{* <div class="col-lg-3 col-xs-9">
+            <div class="search">
+                <div class="input-group">
+                    <input class="form-control" id="search-discussion" type="text" placeholder="Search within discussion"/>
+                    <script>
+                        console.log("The search bar is now placed");
+                    </script>
+                    <span class="input-group-addon">
+                        <i component="user/search/icon" class="fa fa-search"></i>
+                    </span>
+                </div>
+            </div>
+
+            <script>
+                document.addEventListener("DOMContentLoaded", function() {
+                    // Get the search input element
+                    var searchInput = document.getElementById("search-discussion");
+
+                    // Add event listener for input event
+                    searchInput.addEventListener("input", function() {
+                        // Log the input value to the console
+                        console.log("Typed text:", searchInput.value);
+                    });
+                });
+            </script>
+
+        </div> *}}
+
         <div class="btn-group pull-right">
         <!-- IMPORT partials/category/tools.tpl -->
         </div>

@@ -13,12 +13,19 @@ define('admin/manage/category', [
 ], function (uploader, iconSelect, categorySelector, Benchpress, api, bootbox, alerts) {
     const Category = {};
     let updateHash = {};
+   
 
     Category.init = function () {
+
+        console.log("Inside the category.js file")
         $('#category-settings select').each(function () {
             const $this = $(this);
             $this.val($this.attr('data-value'));
+            console.log("This is the correct page");
         });
+        // // Robert - adding functions that routes
+        //  Category.handleSearch();
+
 
         categorySelector.init($('[component="category-selector"]'), {
             onSelect: function (selectedCategory) {
@@ -26,6 +33,7 @@ define('admin/manage/category', [
             },
             showLinks: true,
         });
+
 
         handleTags();
 
@@ -233,9 +241,11 @@ define('admin/manage/category', [
             }).catch(alerts.error);
         });
 
-        // Robert - function for searching general discussion
-        handleCategorySearch();
+        // // Robert - function for searching general discussion
+        // handleCategorySearch();
     };
+
+  
 
     function modified(el) {
         let value;
