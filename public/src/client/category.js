@@ -22,6 +22,7 @@ define('forum/category', [
         const cid = ajaxify.data.cid;
 
         app.enterRoom('category_' + cid);
+        console.log('Entered location where category_ cid is called');
 
         share.addShareHandlers(ajaxify.data.name);
 
@@ -33,6 +34,11 @@ define('forum/category', [
             navigator.init('[component="category/topic"]', ajaxify.data.topic_count, Category.toTop, Category.toBottom, Category.navigatorCallback);
         } else {
             navigator.disable();
+        }
+
+        if (ajaxify.data.slug === '2/general-discussion') {
+            Category.handleSearch();
+        
         }
 
         handleScrollToTopicIndex();
@@ -52,6 +58,27 @@ define('forum/category', [
         hooks.fire('action:topics.loaded', { topics: ajaxify.data.topics });
         hooks.fire('action:category.loaded', { cid: ajaxify.data.cid });
     };
+
+    Category.handleSearch = function (params) {
+        // searchResultCount = params && params.resultCount;
+        console.log("Search is active");
+        $('#search-discussion').on('keyup', utils.debounce(doDiscSearch, 250));
+        $('.search select, .search input[type="checkbox"]').on('change', doDiscSearch);
+    };
+    function doDiscSearch() {
+
+        // Robert: This is the function that is doing the search
+        console.log("Function that is doing the search is now active");
+        // if (!ajaxify.data.template.users) {
+        //     return;
+        // }
+        console.log("Doing search in the correct place")
+        $('[component="user/search/icon"]').removeClass('fa-search').addClass('fa-spinner fa-spin');
+        const searchPrompt = $('#search-discussion').val();
+        // const activeSection = getActiveSection();
+        console.log(searchPrompt);
+    };
+
 
     function handleScrollToTopicIndex() {
         let topicIndex = ajaxify.data.topicIndex;

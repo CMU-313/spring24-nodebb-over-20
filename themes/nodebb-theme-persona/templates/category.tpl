@@ -32,11 +32,11 @@
             document.querySelector('[data-widget-area="header"]').appendChild(searchBar);
 
             // Add event listener for input event
-            document.addEventListener("input", function(event) {
-                if (event.target.id === "search-discussion") {
-                    console.log("Typed text:", event.target.value);
-                }
-            });
+            // document.addEventListener("input", function(event) {
+            //     if (event.target.id === "search-discussion") {
+            //         console.log("Typed text:", event.target.value);
+            //     }
+            // });
         }
     </script>
 </div>

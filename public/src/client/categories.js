@@ -12,7 +12,9 @@ define('forum/categories', ['components', 'categorySelector', 'hooks'], function
 
     categories.init = function () {
         app.enterRoom('categories');
+        console.log('Entered Categories.js file inside the client side');
 
+        // categories.handleSearch();
         socket.removeListener('event:new_post', categories.onNewPost);
         socket.on('event:new_post', categories.onNewPost);
         categorySelector.init($('[component="category-selector"]'), {
@@ -26,6 +28,29 @@ define('forum/categories', ['components', 'categorySelector', 'hooks'], function
             placement: 'bottom',
         });
     };
+
+    // categories.handleSearch = function (params) {
+    //     console.log("Search is active inside the categories.js file");
+    //     $('search-discussion').on('keyup', utils.debounce(doSearch, 250));
+    //     $('.search select').on('change', doSearch);
+    // };
+
+    // function doSearch() {
+    //     $('search-discussion').removeClass('fa-search').addClass('fa-spinner fa-spin');
+    //     const searchString = $('#search-discussion').val();
+    
+
+
+    //     console.log(searchString);
+    //     console.log('Doing search inside the categories.js file')
+    //     // const query = {
+    //     //     query: $('#search').val(),
+    //     //     sortBy: getSortBy(),
+    //     // };
+    //     // loadPage(query);
+    // };
+
+
 
     categories.onNewPost = function (data) {
         if (data && data.posts && data.posts.length && data.posts[0].topic) {
