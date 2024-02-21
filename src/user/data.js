@@ -39,7 +39,7 @@ module.exports = function (User) {
         'icon:bgColor': '#aaa',
         groupTitle: '',
         groupTitleArray: [],
-        displayGroupTitle: 'not entering function',
+        displayGroupTitle: 'Guest',
         status: 'offline',
         reputation: 0,
         'email:confirmed': 0,
@@ -58,10 +58,13 @@ module.exports = function (User) {
 
         const uniqueUids = _.uniq(uids).filter(uid => uid > 0);
 
+        
         const results = await plugins.hooks.fire('filter:user.whitelistFields', {
             uids: uids,
+            //if fields is blank this is what they get set to. which i already added displayGroupTitle to???
             whitelist: fieldWhitelist.slice(),
         });
+        //if fields is blank set fields to results.whitelist
         if (!fields.length) {
             fields = results.whitelist;
         } else {
@@ -137,11 +140,13 @@ module.exports = function (User) {
         return users ? users[0] : null;
     };
 
+    //library.js calls this function
     User.getUserData = async function (uid) {
         const users = await User.getUsersData([uid]);
         return users ? users[0] : null;
     };
 
+    //getUserData calls getUsersData which calls getUserFields with an empty array 
     User.getUsersData = async function (uids) {
         return await User.getUsersFields(uids, []);
     };
@@ -295,7 +300,7 @@ module.exports = function (User) {
         } catch (err) {
             if (user.groupTitle) {
                 user.groupTitleArray = [user.groupTitle];
-                user.displayGroupTitle = user.groupTitle;
+                user.displayGroupTitle = "First";
             } else {
                 user.groupTitle = '';
                 user.displayGroupTitle = 'Guest';
@@ -305,7 +310,7 @@ module.exports = function (User) {
         if (!Array.isArray(user.groupTitleArray)) {
             if (user.groupTitleArray) {
                 user.groupTitleArray = [user.groupTitleArray];
-                user.displayGroupTitle = user.groupTitle
+                user.displayGroupTitle = "Second"
             } else {
                 user.groupTitleArray = [];
                 user.displayGroupTitle = 'Guest';
