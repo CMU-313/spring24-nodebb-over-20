@@ -25,7 +25,7 @@ module.exports = function (User) {
         'aboutme', 'signature', 'uploadedpicture', 'profileviews', 'reputation',
         'postcount', 'topiccount', 'lastposttime', 'banned', 'banned:expire',
         'status', 'flags', 'followerCount', 'followingCount', 'cover:url',
-        'cover:position', 'groupTitle', 'mutedUntil', 'mutedReason',
+        'cover:position', 'groupTitle', 'displayGroupTitle', 'mutedUntil', 'mutedReason',
     ];
 
     User.guestData = {
@@ -39,6 +39,7 @@ module.exports = function (User) {
         'icon:bgColor': '#aaa',
         groupTitle: '',
         groupTitleArray: [],
+        displayGroupTitle: 'not entering function',
         status: 'offline',
         reputation: 0,
         'email:confirmed': 0,
@@ -294,16 +295,20 @@ module.exports = function (User) {
         } catch (err) {
             if (user.groupTitle) {
                 user.groupTitleArray = [user.groupTitle];
+                user.displayGroupTitle = user.groupTitle;
             } else {
                 user.groupTitle = '';
+                user.displayGroupTitle = 'Guest';
                 user.groupTitleArray = [];
             }
         }
         if (!Array.isArray(user.groupTitleArray)) {
             if (user.groupTitleArray) {
                 user.groupTitleArray = [user.groupTitleArray];
+                user.displayGroupTitle = user.groupTitle
             } else {
                 user.groupTitleArray = [];
+                user.displayGroupTitle = 'Guest';
             }
         }
         if (!meta.config.allowMultipleBadges && user.groupTitleArray.length) {
