@@ -77,6 +77,7 @@ define('forum/category', [
         const searchPrompt = $('#search-discussion').val();
         // const activeSection = getActiveSection();
         console.log(searchPrompt);
+
     };
 
 

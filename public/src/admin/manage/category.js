@@ -1,7 +1,6 @@
 'use strict';
 
-const posts = require("../../../src/posts");
-const winston = require("winston");
+// const posts = require("../../../../src/posts");
 define('admin/manage/category', [
     'uploader',
     'iconSelect',
@@ -304,9 +303,7 @@ define('admin/manage/category', [
         $('#search-discussion').on('input', function () {
             // console.log("Hello World");
             // console.log($(this).val());
-            // TODO Find out how to print this out properly
-            console.log(posts.getPidsByContent($(this).val()))
-            winston.info("Hello World")
+            // console.log(posts.getPidsByContent($(this).val()))
         });
     }
 
