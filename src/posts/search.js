@@ -1,7 +1,6 @@
-
-
 const db = require('../database');
 
+// TODO test
 module.exports = function (Posts) {
     Posts.getPidsByContent = async function (content) {
 

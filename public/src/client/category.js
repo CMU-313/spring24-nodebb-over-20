@@ -75,11 +75,45 @@ define('forum/category', [
         console.log("Doing search in the correct place")
         $('[component="user/search/icon"]').removeClass('fa-search').addClass('fa-spinner fa-spin');
         const searchPrompt = $('#search-discussion').val();
-        // const activeSection = getActiveSection();
+        const activeSection = getActiveSection();
         console.log(searchPrompt);
+        // TODO test
+        const query = {
+            section: activeSection,
+            page: 1,
+        };
+        if (!searchPrompt) {
+            return loadPage(query);
+        }
 
+        query.query = searchPrompt;
+        loadPage(query);
     };
 
+    // TODO copied from public/src/client/users.js, fix to work with current
+    function loadPage(query) {
+        api.getPosts('/api/posts', query)
+            .then(renderSearchResults)
+            .catch(alerts.error);
+    }
+
+    // TODO copied from public/src/client/users.js, fix to work with current
+    function renderSearchResults(data) {
+        Benchpress.render('partials/paginator', { pagination: data.pagination }).then(function (html) {
+            $('.pagination-container').replaceWith(html);
+        });
+
+        if (searchResultCount) {
+            data.users = data.users.slice(0, searchResultCount);
+        }
+
+        data.isAdminOrGlobalMod = app.user.isAdmin || app.user.isGlobalMod;
+        app.parseAndTranslate('users', 'users', data, function (html) {
+            $('#users-container').html(html);
+            html.find('span.timeago').timeago();
+            $('[component="user/search/icon"]').addClass('fa-search').removeClass('fa-spinner fa-spin');
+        });
+    }
 
     function handleScrollToTopicIndex() {
         let topicIndex = ajaxify.data.topicIndex;

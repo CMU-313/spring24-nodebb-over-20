@@ -42,6 +42,18 @@ postsAPI.get = async function (caller, data) {
     return post;
 };
 
+// TODO test
+postsAPI.getPosts = async function (caller, data) {
+    let out = []
+    const pids = posts.getPidsByContent(data.query);
+    for (let i = 0; i < pids.length; i++) {
+        const newData = data;
+        newData.pid = pids[i];
+        out.push(postsAPI.get(caller, newData));
+    }
+    return out;
+}
+
 postsAPI.edit = async function (caller, data) {
     if (!data || !data.pid || (meta.config.minimumPostLength !== 0 && !data.content)) {
         throw new Error('[[error:invalid-data]]');
