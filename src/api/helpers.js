@@ -11,11 +11,7 @@ const websockets = require('../socket.io');
 const events = require('../events');
 
 exports.setDefaultPostData = function (reqOrSocket, data) {
-    if (data.anonymous) {
-        data.uid = 0;
-    } else {
-        data.uid = reqOrSocket.uid;
-    }
+    data.uid = reqOrSocket.uid;
     data.req = exports.buildReqObject(reqOrSocket, { ...data });
     data.timestamp = Date.now();
     data.fromQueue = false;

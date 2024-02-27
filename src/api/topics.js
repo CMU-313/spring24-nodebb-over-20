@@ -76,10 +76,7 @@ topicsAPI.reply = async function (caller, data) {
 
     apiHelpers.setDefaultPostData(caller, payload);
 
-    let replyUID = caller.uid;
-    if (data.anonymous) {
-        replyUID = -1;
-    }
+    const replyUID = caller.uid;
 
     await meta.blacklist.test(caller.ip);
     const shouldQueue = await posts.shouldQueue(replyUID, payload);

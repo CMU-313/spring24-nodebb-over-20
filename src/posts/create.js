@@ -16,6 +16,8 @@ module.exports = function (Posts) {
         // This is an internal method, consider using Topics.reply instead
         const { uid } = data;
         const { tid } = data;
+        const { anonymous } = data;
+
         const content = data.content.toString();
         const timestamp = data.timestamp || Date.now();
         const isMain = data.isMain || false;
@@ -29,9 +31,15 @@ module.exports = function (Posts) {
         }
 
         const pid = await db.incrObjectField('global', 'nextPid');
+
+        let postUID = uid;
+        if (anonymous) {
+            postUID = 0;
+        }
+
         let postData = {
             pid: pid,
-            uid: uid,
+            uid: postUID,
             tid: tid,
             content: content,
             timestamp: timestamp,

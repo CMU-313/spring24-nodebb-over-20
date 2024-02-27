@@ -189,7 +189,7 @@ module.exports = function (Topics) {
             await Topics.follow(postData.tid, uid);
         }
 
-        if (parseInt(uid, 10) > 0) {
+        if (parseInt(uid, 10)) {
             user.setUserField(uid, 'lastonline', Date.now());
         }
 
