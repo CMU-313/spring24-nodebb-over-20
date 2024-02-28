@@ -68,7 +68,6 @@ define('forum/category', [
     function doDiscSearch() {
 
         // Robert: This is the function that is doing the search
-        console.log("Function that is doing the search is now active");
         // if (!ajaxify.data.template.users) {
         //     return;
         // }
