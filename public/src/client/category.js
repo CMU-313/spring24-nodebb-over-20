@@ -8,7 +8,7 @@ define('forum/category', [
     'sort',
     'categorySelector',
     'hooks',
-    'alerts'.
+    'alerts',
 ], function (infinitescroll, share, navigator, topicList, sort, categorySelector, hooks, alerts) {
     const Category = {};
 
