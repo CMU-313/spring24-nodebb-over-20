@@ -33,6 +33,7 @@ define('forum/topic', [
         }
     });
 
+
     Topic.init = function () {
         const tidChanged = !tid || parseInt(tid, 10) !== parseInt(ajaxify.data.tid, 10);
         tid = ajaxify.data.tid;

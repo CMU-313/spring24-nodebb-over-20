@@ -32,6 +32,8 @@ Groups.systemGroups = [
     'unverified-users',
     Groups.BANNED_USERS,
     'administrators',
+    // I thought I had to add students & instructors as groups but
+    // they're actually account types
     'Global Moderators',
 ];
 

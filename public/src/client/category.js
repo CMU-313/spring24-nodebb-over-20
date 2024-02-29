@@ -23,8 +23,6 @@ define('forum/category', [
         const cid = ajaxify.data.cid;
 
         app.enterRoom('category_' + cid);
-        console.log('Entered location where category_ cid is called');
-
         share.addShareHandlers(ajaxify.data.name);
 
         topicList.init('category', loadTopicsAfter);
@@ -40,7 +38,6 @@ define('forum/category', [
         if (ajaxify.data.slug === '2/general-discussion') {
             Category.handleSearch();
         }
-
         handleScrollToTopicIndex();
 
         handleIgnoreWatch(cid);
@@ -54,64 +51,32 @@ define('forum/category', [
                 ajaxify.go('/category/' + category.cid);
             },
         });
-
         hooks.fire('action:topics.loaded', { topics: ajaxify.data.topics });
         hooks.fire('action:category.loaded', { cid: ajaxify.data.cid });
     };
 
     Category.handleSearch = function () {
-        // searchResultCount = params && params.resultCount;
-        console.log('Search is active');
         $('#search-discussion').on('keyup', utils.debounce(doDiscSearch, 250));
         $('.search select, .search input[type="checkbox"]').on('change', doDiscSearch);
     };
+  
     function doDiscSearch() {
-        // Robert: This is the function that is doing the search
-        console.log('Function that is doing the search is now active');
-        // if (!ajaxify.data.template.users) {
-        //     return;
-        // }
-        console.log('Doing search in the correct place');
+        console.log('Search function ran');
         $('[component="user/search/icon"]').removeClass('fa-search').addClass('fa-spinner fa-spin');
-        const searchPrompt = $('#search-discussion').val();
-        const activeSection = getActiveSection();
-        console.log(searchPrompt);
-        // TODO test
-        const query = {
-            section: activeSection,
-            page: 1,
-        };
+        const searchPrompt = $('#search-discussion').val().trim(); // Trim the search prompt to remove leading and trailing spaces
         if (!searchPrompt) {
-            return loadPage(query);
+            displayErrorMessage('Please enter a search term.');
         }
-
-        query.query = searchPrompt;
-        loadPage(query);
+        console.log('The prompt is ' + searchPrompt);
     }
-
-    // TODO copied from public/src/client/users.js, fix to work with current
-    function loadPage(query) {
-        console.log(`LoadPage: ${query}`);
-        api.getPosts('/api/posts', query).then(renderSearchResults).catch(alerts.error);
-    }
-
-    // TODO copied from public/src/client/users.js, fix to work with current
-    function renderSearchResults(data) {
-        console.log(`Called renderSearch: ${data}`);
-        // Benchpress.render('partials/paginator', { pagination: data.pagination }).then(function (html) {
-        //     $('.pagination-container').replaceWith(html);
-        // });
-
-        // if (searchResultCount) {
-        //     data.users = data.users.slice(0, searchResultCount);
-        // }
-
-        // data.isAdminOrGlobalMod = app.user.isAdmin || app.user.isGlobalMod;
-        // app.parseAndTranslate('users', 'users', data, function (html) {
-        //     $('#users-container').html(html);
-        //     html.find('span.timeago').timeago();
-        //     $('[component="user/search/icon"]').addClass('fa-search').removeClass('fa-spinner fa-spin');
-        // });
+  
+    function displayErrorMessage(message) {
+        // Display error message to the user
+        const errorContainer = $('#search-error-message');
+        errorContainer.text(message).addClass('search-error-visible');
+        setTimeout(function () {
+            errorContainer.removeClass('search-error-visible').text('');
+        }, 3000); // Hide the error message after 3 seconds
     }
 
     function handleScrollToTopicIndex() {
@@ -123,7 +88,6 @@ define('forum/category', [
             }
         }
     }
-
     function handleIgnoreWatch(cid) {
         $('[component="category/watching"], [component="category/ignoring"], [component="category/notwatching"]').on('click', function () {
             const $this = $(this);

@@ -1,6 +1,5 @@
 'use strict';
 
-
 define('forum/users', [
     'translator', 'benchpress', 'api', 'alerts', 'accounts/invite',
 ], function (translator, Benchpress, api, alerts, AccountInvite) {
@@ -26,7 +25,6 @@ define('forum/users', [
 
     Users.handleSearch = function (params) {
         searchResultCount = params && params.resultCount;
-        console.log('Search is active');
         $('#search-user').on('keyup', utils.debounce(doSearch, 250));
         $('.search select, .search input[type="checkbox"]').on('change', doSearch);
     };
