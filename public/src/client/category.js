@@ -8,9 +8,8 @@ define('forum/category', [
     'sort',
     'categorySelector',
     'hooks',
-    'alerts',
-    'api',
-], function (infinitescroll, share, navigator, topicList, sort, categorySelector, hooks, alerts, api) {
+    'alerts'
+], function (infinitescroll, share, navigator, topicList, sort, categorySelector, hooks, alerts) {
     const Category = {};
 
     $(window).on('action:ajaxify.start', function (ev, data) {
@@ -60,7 +59,6 @@ define('forum/category', [
     };
 
     Category.handleSearch = function () {
-        // searchResultCount = params && params.resultCount;
         console.log('Search is active');
         $('#search-discussion').on('keyup', utils.debounce(doDiscSearch, 250));
         $('.search select, .search input[type="checkbox"]').on('change', doDiscSearch);
@@ -68,9 +66,6 @@ define('forum/category', [
     function doDiscSearch() {
         // Robert: This is the function that is doing the search
         console.log('Function that is doing the search is now active');
-        // if (!ajaxify.data.template.users) {
-        //     return;
-        // }
         console.log('Doing search in the correct place');
         $('[component="user/search/icon"]').removeClass('fa-search').addClass('fa-spinner fa-spin');
         const searchPrompt = $('#search-discussion').val();
@@ -210,10 +205,6 @@ define('forum/category', [
             hooks.fire('action:topics.loaded', { topics: data.topics });
             callback(data, done);
         });
-    }
-
-    function getActiveSection() {
-        return utils.param('section') || '';
     }
 
     return Category;

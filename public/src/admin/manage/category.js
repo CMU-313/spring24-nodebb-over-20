@@ -20,9 +20,6 @@ define('admin/manage/category', [
             $this.val($this.attr('data-value'));
             console.log('This is the correct page');
         });
-        // // Robert - adding functions that routes
-        //  Category.handleSearch();
-
 
         categorySelector.init($('[component="category-selector"]'), {
             onSelect: function (selectedCategory) {
@@ -30,7 +27,6 @@ define('admin/manage/category', [
             },
             showLinks: true,
         });
-
 
         handleTags();
 
