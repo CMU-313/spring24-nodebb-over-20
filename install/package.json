@@ -12,7 +12,7 @@
     "scripts": {
         "start": "npx tsc && node loader.js",
         "lint": "npx tsc && eslint --cache ./nodebb .  --resolve-plugins-relative-to .",
-        "test": "npx tsc && nyc --reporter=html --reporter=text-summary mocha && cd plugins/nodebb-plugin-composer-anonymous && npm link && cd ../.. && npm link nodebb-plugin-composer-anonymous",
+        "test": "npx tsc && nyc --reporter=html --reporter=text-summary mocha",
         "link-anonymous": "cd plugins/nodebb-plugin-composer-anonymous && npm link && cd ../.. && npm link nodebb-plugin-composer-anonymous",
         "coverage": "nyc report --reporter=text-lcov > ./coverage/lcov.info",
         "coveralls": "nyc report --reporter=text-lcov | coveralls && rm -r coverage"
