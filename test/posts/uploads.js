@@ -62,15 +62,6 @@ describe('upload methods', () => {
         purgePid = purgePostData.postData.pid;
     });
 
-    // ! IDK if this is right
-    describe('.getPidsByContent()', () => {
-        it('should return proper pids', (done) => {
-            const pids = posts.search.getPidsByContent("here");
-            assert(pids == [pid, purgePid]);
-            done();
-        })
-    })
-
     describe('.sync()', () => {
         it('should properly add new images to the post\'s zset', (done) => {
             posts.uploads.sync(pid, (err) => {
@@ -420,6 +411,53 @@ describe('post uploads management', () => {
             assert.ifError(err);
             assert.strictEqual(true, Array.isArray(uploads));
             assert.strictEqual(0, uploads.length);
+            done();
+        });
+    });
+});
+
+describe('search methods', () => {
+    let pid;
+    let purgePid;
+    let cid;
+    let uid;
+
+    before(async () => {
+        _recreateFiles();
+
+        uid = await user.create({
+            username: 'uploads user',
+            password: 'abracadabra',
+            gdpr_consent: 1,
+        });
+
+        ({ cid } = await categories.create({
+            name: 'Test Category',
+            description: 'Test category created by testing script',
+        }));
+
+        const topicPostData = await topics.post({
+            uid,
+            cid,
+            title: 'topic with some images',
+            content: 'here is an image [alt text](/assets/uploads/files/abracadabra.png) and another [alt text](/assets/uploads/files/shazam.jpg)',
+        });
+        pid = topicPostData.postData.pid;
+
+        const purgePostData = await topics.post({
+            uid,
+            cid,
+            title: 'topic with some images, to be purged',
+            content: 'here is an image [alt text](/assets/uploads/files/whoa.gif) and another [alt text](/assets/uploads/files/amazeballs.jpg)',
+        });
+        purgePid = purgePostData.postData.pid;
+    });
+
+    // ! IDK if this is right
+    describe('.getPidsByContent()', () => {
+        it('should return proper pids', (done) => {
+            const pids = posts.search.getPidsByContent('here');
+            console.assert(pids[0] === pid && pids[1] === purgePid);
             done();
         });
     });

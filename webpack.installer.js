@@ -20,7 +20,6 @@ module.exports = {
             'public/src',
             'node_modules',
         ],
-        fallback: { 
-            path: require.resolve("path-browserify") },
+        fallback: { path: require.resolve('path-browserify') },
     },
 };

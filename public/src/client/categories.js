@@ -38,7 +38,6 @@ define('forum/categories', ['components', 'categorySelector', 'hooks'], function
     // function doSearch() {
     //     $('search-discussion').removeClass('fa-search').addClass('fa-spinner fa-spin');
     //     const searchString = $('#search-discussion').val();
-    
 
 
     //     console.log(searchString);

@@ -26,7 +26,7 @@ define('forum/users', [
 
     Users.handleSearch = function (params) {
         searchResultCount = params && params.resultCount;
-        console.log("Search is active");
+        console.log('Search is active');
         $('#search-user').on('keyup', utils.debounce(doSearch, 250));
         $('.search select, .search input[type="checkbox"]').on('change', doSearch);
     };
@@ -35,7 +35,7 @@ define('forum/users', [
         if (!ajaxify.data.template.users) {
             return;
         }
-        console.log('Doing search')
+        console.log('Doing search');
         $('[component="user/search/icon"]').removeClass('fa-search').addClass('fa-spinner fa-spin');
         const username = $('#search-user').val();
         const activeSection = getActiveSection();

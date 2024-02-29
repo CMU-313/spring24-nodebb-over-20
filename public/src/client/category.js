@@ -9,7 +9,7 @@ define('forum/category', [
     'categorySelector',
     'hooks',
     'alerts',
-    'api'
+    'api',
 ], function (infinitescroll, share, navigator, topicList, sort, categorySelector, hooks, alerts, api) {
     const Category = {};
 
@@ -39,7 +39,6 @@ define('forum/category', [
 
         if (ajaxify.data.slug === '2/general-discussion') {
             Category.handleSearch();
-        
         }
 
         handleScrollToTopicIndex();
@@ -60,20 +59,19 @@ define('forum/category', [
         hooks.fire('action:category.loaded', { cid: ajaxify.data.cid });
     };
 
-    Category.handleSearch = function (params) {
+    Category.handleSearch = function () {
         // searchResultCount = params && params.resultCount;
-        console.log("Search is active");
+        console.log('Search is active');
         $('#search-discussion').on('keyup', utils.debounce(doDiscSearch, 250));
         $('.search select, .search input[type="checkbox"]').on('change', doDiscSearch);
     };
     function doDiscSearch() {
-
         // Robert: This is the function that is doing the search
-        console.log("Function that is doing the search is now active");
+        console.log('Function that is doing the search is now active');
         // if (!ajaxify.data.template.users) {
         //     return;
         // }
-        console.log("Doing search in the correct place")
+        console.log('Doing search in the correct place');
         $('[component="user/search/icon"]').removeClass('fa-search').addClass('fa-spinner fa-spin');
         const searchPrompt = $('#search-discussion').val();
         const activeSection = getActiveSection();
@@ -89,19 +87,17 @@ define('forum/category', [
 
         query.query = searchPrompt;
         loadPage(query);
-    };
+    }
 
     // TODO copied from public/src/client/users.js, fix to work with current
     function loadPage(query) {
-        console.log(`LoadPage: ${query}`)
-        api.getPosts('/api/posts', query)
-            .then(renderSearchResults)
-            .catch(alerts.error);
+        console.log(`LoadPage: ${query}`);
+        api.getPosts('/api/posts', query).then(renderSearchResults).catch(alerts.error);
     }
 
     // TODO copied from public/src/client/users.js, fix to work with current
     function renderSearchResults(data) {
-        console.log("Called renderSearch")
+        console.log(`Called renderSearch: ${data}`);
         // Benchpress.render('partials/paginator', { pagination: data.pagination }).then(function (html) {
         //     $('.pagination-container').replaceWith(html);
         // });

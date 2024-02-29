@@ -16,8 +16,7 @@ define('admin/manage/categories', [
     let sortables;
 
     Categories.init = function () {
-
-        console.log("entered  categories.js file")
+        console.log('entered  categories.js file');
         categorySelector.init($('.category [component="category-selector"]'), {
             parentCid: ajaxify.data.selectedCategory ? ajaxify.data.selectedCategory.cid : 0,
             onSelect: function (selectedCategory) {
@@ -90,7 +89,6 @@ define('admin/manage/categories', [
             el.find('i').toggleClass('fa-chevron-down', expand).toggleClass('fa-chevron-right', !expand);
             el.closest('[data-cid]').find('> ul[data-cid]').toggleClass('hidden', !expand);
         }
-        
     };
 
     Categories.throwCreateModal = function () {

@@ -44,18 +44,18 @@ postsAPI.get = async function (caller, data) {
 
 // TODO test
 postsAPI.getPosts = async function (caller, data) {
-    assert(typeof data == "object");
-    assert(typeof caller == "object");
-    let out = []
+    console.assert(typeof data === 'object');
+    console.assert(typeof caller === 'object');
+    const out = [];
     const pids = posts.getPidsByContent(data.query);
     for (let i = 0; i < pids.length; i++) {
         const newData = data;
         newData.pid = pids[i];
         out.push(postsAPI.get(caller, newData));
     }
-    assert(Array.isArray(out));
+    console.assert(Array.isArray(out));
     return out;
-}
+};
 
 postsAPI.edit = async function (caller, data) {
     if (!data || !data.pid || (meta.config.minimumPostLength !== 0 && !data.content)) {
