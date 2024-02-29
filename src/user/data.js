@@ -220,18 +220,23 @@ module.exports = function (User) {
                 user.picture = User.getDefaultAvatar();
             }
 
+            //i believe hasOwnProperty is if the function is requesting this value returned, 
+            //not whether or not the value is null/empty/etc
             if (user.hasOwnProperty('displayGroupTitle')) {
-               // console.log("hello?")
-                //user.displayGroupTitle = user.accounttype.toString();
                 if(user.accounttype){
+                    //capitalizing the first letter of the account type (eg. 'student'-> 'Student')
                     user.displayGroupTitle = user.accounttype.toString().charAt(0).toUpperCase()+ user.accounttype.toString().slice(1);
+                }
+                else{
+                    //default value
+                    user.displayGroupTitle = "Student";
                 }
             }
 
+            //Admin is not a account type, it's a group title, so parse group title has been updated to also set displayGroupType 
+            //for admins. (['administrators'] -> 'Administrator')
             if (user.hasOwnProperty('groupTitle') || user.hasOwnProperty('groupTitleArray')) {
-               // console.log("entering grouptitle/grouptitle array: ", user.displayname, user.groupTitle, user.displayGroupTitle, user.groupTitleArray)
                 parseGroupTitle(user);
-                //console.log(user.groupTitle, user.displayGroupTitle, user.groupTitleArray)
             }
 
             if (user.picture && user.picture === user.uploadedpicture) {
@@ -312,8 +317,10 @@ module.exports = function (User) {
     function parseGroupTitle(user) {
         try {
             user.groupTitleArray = JSON.parse(user.groupTitle);
+            //setting displayGroupTitle if the user is an admin, since that's stored
+            //in a different place than if they're a student or instructor
                 if(user.groupTitleArray[0] == 'administrators'){
-                    user.displayGroupTitle = 'Administrator'
+                    user.displayGroupTitle = 'Administrator';
                 }
         } catch (err) {
             if (user.groupTitle) {
@@ -329,7 +336,6 @@ module.exports = function (User) {
                 
             } else {
                 user.groupTitleArray = [];
-                user.displayGroupTitle = 'Guest2';
             }
         }
         if (!meta.config.allowMultipleBadges && user.groupTitleArray.length) {
