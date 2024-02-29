@@ -98,6 +98,9 @@ UserObj:
     groupTitle:
       type: string
       example: '["administrators","Staff"]'
+    displayGroupTitle:
+      type: string
+      example: "Administrator"
     groupTitleArray:
       type: array
       example:

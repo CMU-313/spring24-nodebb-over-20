@@ -25,7 +25,7 @@ module.exports = function (User) {
         'aboutme', 'signature', 'uploadedpicture', 'profileviews', 'reputation',
         'postcount', 'topiccount', 'lastposttime', 'banned', 'banned:expire',
         'status', 'flags', 'followerCount', 'followingCount', 'cover:url',
-        'cover:position', 'groupTitle', 'mutedUntil', 'mutedReason',
+        'cover:position', 'groupTitle', 'displayGroupTitle', 'mutedUntil', 'mutedReason',
     ];
 
     User.guestData = {
@@ -39,6 +39,7 @@ module.exports = function (User) {
         'icon:bgColor': '#aaa',
         groupTitle: '',
         groupTitleArray: [],
+        displayGroupTitle: 'Guest',
         status: 'offline',
         reputation: 0,
         'email:confirmed': 0,
@@ -48,7 +49,6 @@ module.exports = function (User) {
         if (!Array.isArray(uids) || !uids.length) {
             return [];
         }
-
         uids = uids.map(uid => (isNaN(uid) ? 0 : parseInt(uid, 10)));
 
         const fieldsToRemove = [];
@@ -59,8 +59,13 @@ module.exports = function (User) {
 
         const results = await plugins.hooks.fire('filter:user.whitelistFields', {
             uids: uids,
+            // Comment from when I was trying to figure out what fields are returned
+            // In the getUserData/getUserFields functions
+            // If fields is blank this is what they get set to. which i already added displayGroupTitle to???
             whitelist: fieldWhitelist.slice(),
         });
+
+        // if fields is blank set fields to results.whitelist
         if (!fields.length) {
             fields = results.whitelist;
         } else {
@@ -74,6 +79,7 @@ module.exports = function (User) {
             users: users,
             fields: fields,
         });
+
         result.users.forEach((user, index) => {
             if (uniqueUids[index] > 0 && !user.uid) {
                 user.oldUid = uniqueUids[index];
@@ -125,6 +131,8 @@ module.exports = function (User) {
         });
         return users;
     }
+
+    // All getUser(s)Data/Fields/etc. functions just call getUsersFields
 
     User.getUserField = async function (uid, field) {
         const user = await User.getUserFields(uid, [field]);
@@ -209,7 +217,23 @@ module.exports = function (User) {
                 user.picture = User.getDefaultAvatar();
             }
 
-            if (user.hasOwnProperty('groupTitle')) {
+            // I believe hasOwnProperty is if the function is requesting this value returned,
+            // not whether or not the value is null/empty/etc
+            if (user.hasOwnProperty('displayGroupTitle')) {
+                if (user.accounttype) {
+                    // Capitalizing the first letter of the account type (eg. 'student'-> 'Student')
+                    user.displayGroupTitle = user.accounttype.toString().charAt(0).toUpperCase();
+                    user.displayGroupTitle += user.accounttype.toString().slice(1);
+                } else {
+                    // Setting a default value
+                    user.displayGroupTitle = 'Student';
+                }
+            }
+
+            // Admin is not a account type, it's a group title, so
+            // parseGroupTitle has been updated to also set displayGroupType
+            // for admins. (['administrators'] -> 'Administrator')
+            if (user.hasOwnProperty('groupTitle') || user.hasOwnProperty('groupTitleArray')) {
                 parseGroupTitle(user);
             }
 
@@ -291,6 +315,11 @@ module.exports = function (User) {
     function parseGroupTitle(user) {
         try {
             user.groupTitleArray = JSON.parse(user.groupTitle);
+            // Setting displayGroupTitle if the user is an admin, since that's stored
+            // in a different place than if they're a student or instructor
+            if (user.groupTitleArray[0] === 'administrators') {
+                user.displayGroupTitle = 'Administrator';
+            }
         } catch (err) {
             if (user.groupTitle) {
                 user.groupTitleArray = [user.groupTitle];
