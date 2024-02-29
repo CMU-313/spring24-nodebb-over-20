@@ -1,2 +1,0 @@
-(function(n,o){n.doStuff=function(){o.body.innerHTML="Stuff has been done"}})(window,document);function foo(n,o){return'The person known as "'+n+'" is '+o+" years old"}
-//# sourceMappingURL=minified.js.map

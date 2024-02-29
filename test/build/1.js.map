@@ -1,1 +1,0 @@
-{"version":3,"sources":["1.js"],"names":["window","document","doStuff","body","innerHTML"],"mappings":"CAAA,SAAWA,EAAQC,GACfD,EAAOE,QAAU,WACbD,EAASE,KAAKC,UAAY,wBAFlC,CAIGJ,OAAQC","file":"1.js","sourcesContent":["(function (window, document) {\n    window.doStuff = function () {\n        document.body.innerHTML = 'Stuff has been done';\n    };\n})(window, document);\n"]}
