@@ -8,7 +8,7 @@ define('forum/category', [
     'sort',
     'categorySelector',
     'hooks',
-    'alerts'
+    'alerts'.
 ], function (infinitescroll, share, navigator, topicList, sort, categorySelector, hooks, alerts) {
     const Category = {};
 
@@ -58,7 +58,7 @@ define('forum/category', [
         $('#search-discussion').on('keyup', utils.debounce(doDiscSearch, 250));
         $('.search select, .search input[type="checkbox"]').on('change', doDiscSearch);
     };
-  
+
     function doDiscSearch() {
         console.log('Search function ran');
         $('[component="user/search/icon"]').removeClass('fa-search').addClass('fa-spinner fa-spin');
@@ -68,7 +68,7 @@ define('forum/category', [
         }
         console.log('The prompt is ' + searchPrompt);
     }
-  
+
     function displayErrorMessage(message) {
         // Display error message to the user
         const errorContainer = $('#search-error-message');

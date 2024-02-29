@@ -17,7 +17,6 @@ define('admin/manage/category', [
         $('#category-settings select').each(function () {
             const $this = $(this);
             $this.val($this.attr('data-value'));
-
         });
         categorySelector.init($('[component="category-selector"]'), {
             onSelect: function (selectedCategory) {
