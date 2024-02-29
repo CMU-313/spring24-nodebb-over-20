@@ -49,7 +49,6 @@ module.exports = function (User) {
         if (!Array.isArray(uids) || !uids.length) {
             return [];
         }
-
         uids = uids.map(uid => (isNaN(uid) ? 0 : parseInt(uid, 10)));
 
         const fieldsToRemove = [];
@@ -58,12 +57,13 @@ module.exports = function (User) {
 
         const uniqueUids = _.uniq(uids).filter(uid => uid > 0);
 
-        
+        //console.log("fields: ", fields)
         const results = await plugins.hooks.fire('filter:user.whitelistFields', {
             uids: uids,
             //if fields is blank this is what they get set to. which i already added displayGroupTitle to???
             whitelist: fieldWhitelist.slice(),
         });
+       // console.log("results.whitelist: ", results.whitelist);
         //if fields is blank set fields to results.whitelist
         if (!fields.length) {
             fields = results.whitelist;
@@ -78,12 +78,16 @@ module.exports = function (User) {
             users: users,
             fields: fields,
         });
+        //console.log("result.fields: ", result.fields);
         result.users.forEach((user, index) => {
             if (uniqueUids[index] > 0 && !user.uid) {
                 user.oldUid = uniqueUids[index];
             }
         });
+        //console.log("modifyUserData fields: ", fields)
+        //console.log("modifyUserData fieldstoremove: ", fieldsToRemove)
         await modifyUserData(result.users, fields, fieldsToRemove);
+        //console.log("result.users: ", result.users)
         return uidsToUsers(uids, uniqueUids, result.users);
     };
 
@@ -196,6 +200,7 @@ module.exports = function (User) {
             if (!user) {
                 return;
             }
+            //console.log("acct type:", user.accounttype);
 
             db.parseIntFields(user, intFields, requestedFields);
 
@@ -215,8 +220,18 @@ module.exports = function (User) {
                 user.picture = User.getDefaultAvatar();
             }
 
-            if (user.hasOwnProperty('groupTitle')) {
+            if (user.hasOwnProperty('displayGroupTitle')) {
+               // console.log("hello?")
+                //user.displayGroupTitle = user.accounttype.toString();
+                if(user.accounttype){
+                    user.displayGroupTitle = user.accounttype.toString().charAt(0).toUpperCase()+ user.accounttype.toString().slice(1);
+                }
+            }
+
+            if (user.hasOwnProperty('groupTitle') || user.hasOwnProperty('groupTitleArray')) {
+               // console.log("entering grouptitle/grouptitle array: ", user.displayname, user.groupTitle, user.displayGroupTitle, user.groupTitleArray)
                 parseGroupTitle(user);
+                //console.log(user.groupTitle, user.displayGroupTitle, user.groupTitleArray)
             }
 
             if (user.picture && user.picture === user.uploadedpicture) {
@@ -297,23 +312,24 @@ module.exports = function (User) {
     function parseGroupTitle(user) {
         try {
             user.groupTitleArray = JSON.parse(user.groupTitle);
+                if(user.groupTitleArray[0] == 'administrators'){
+                    user.displayGroupTitle = 'Administrator'
+                }
         } catch (err) {
             if (user.groupTitle) {
                 user.groupTitleArray = [user.groupTitle];
-                user.displayGroupTitle = "First";
             } else {
                 user.groupTitle = '';
-                user.displayGroupTitle = 'Guest';
                 user.groupTitleArray = [];
             }
         }
         if (!Array.isArray(user.groupTitleArray)) {
             if (user.groupTitleArray) {
                 user.groupTitleArray = [user.groupTitleArray];
-                user.displayGroupTitle = "Second"
+                
             } else {
                 user.groupTitleArray = [];
-                user.displayGroupTitle = 'Guest';
+                user.displayGroupTitle = 'Guest2';
             }
         }
         if (!meta.config.allowMultipleBadges && user.groupTitleArray.length) {

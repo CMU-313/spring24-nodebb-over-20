@@ -32,6 +32,9 @@ Groups.systemGroups = [
     'unverified-users',
     Groups.BANNED_USERS,
     'administrators',
+    //no longer adding groups since account-type apparently exists smh
+    //'Instructors',
+    //'Students'
     'Global Moderators',
 ];
 

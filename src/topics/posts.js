@@ -103,6 +103,7 @@ module.exports = function (Topics) {
         }
     }
 
+    //HERE. HERE is where user data is being passed to posts i believe.
     Topics.addPostData = async function (postData, uid) {
         if (!Array.isArray(postData) || !postData.length) {
             return [];
@@ -124,7 +125,7 @@ module.exports = function (Topics) {
             posts.hasBookmarked(pids, uid),
             posts.getVoteStatusByPostIDs(pids, uid),
             getPostUserData('uid', async uids => await posts.getUserInfoForPosts(uids, uid)),
-            getPostUserData('editor', async uids => await user.getUsersFields(uids, ['uid', 'username', 'userslug'])),
+            getPostUserData('editor', async uids => await user.getUsersFields(uids, ['uid', 'username', 'userslug', 'accounttype'])),
             getPostReplies(pids, uid),
             Topics.addParentPosts(postData),
         ]);

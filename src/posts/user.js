@@ -102,7 +102,7 @@ module.exports = function (Posts) {
     async function getUserData(uids, uid) {
         const fields = [
             'uid', 'username', 'fullname', 'userslug',
-            'reputation', 'postcount', 'topiccount', 'picture',
+            'reputation', 'postcount', 'accounttype', 'topiccount', 'picture',
             'signature', 'banned', 'banned:expire', 'status',
             'lastonline', 'groupTitle', 'mutedUntil',
         ];
@@ -111,6 +111,7 @@ module.exports = function (Posts) {
             uid: uid,
             uids: uids,
         });
+        console.log("result: ", result);
         return await user.getUsersFields(result.uids, _.uniq(result.fields));
     }
 
