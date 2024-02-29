@@ -57,14 +57,15 @@ module.exports = function (User) {
 
         const uniqueUids = _.uniq(uids).filter(uid => uid > 0);
 
-        //console.log("fields: ", fields)
         const results = await plugins.hooks.fire('filter:user.whitelistFields', {
             uids: uids,
-            //if fields is blank this is what they get set to. which i already added displayGroupTitle to???
+            // Comment from when I was trying to figure out what fields are returned
+            // In the getUserData/getUserFields functions
+            // If fields is blank this is what they get set to. which i already added displayGroupTitle to???
             whitelist: fieldWhitelist.slice(),
         });
-       // console.log("results.whitelist: ", results.whitelist);
-        //if fields is blank set fields to results.whitelist
+
+        // if fields is blank set fields to results.whitelist
         if (!fields.length) {
             fields = results.whitelist;
         } else {
@@ -78,16 +79,13 @@ module.exports = function (User) {
             users: users,
             fields: fields,
         });
-        //console.log("result.fields: ", result.fields);
+
         result.users.forEach((user, index) => {
             if (uniqueUids[index] > 0 && !user.uid) {
                 user.oldUid = uniqueUids[index];
             }
         });
-        //console.log("modifyUserData fields: ", fields)
-        //console.log("modifyUserData fieldstoremove: ", fieldsToRemove)
         await modifyUserData(result.users, fields, fieldsToRemove);
-        //console.log("result.users: ", result.users)
         return uidsToUsers(uids, uniqueUids, result.users);
     };
 
@@ -134,6 +132,8 @@ module.exports = function (User) {
         return users;
     }
 
+    // All getUser(s)Data/Fields/etc. functions just call getUsersFields
+
     User.getUserField = async function (uid, field) {
         const user = await User.getUserFields(uid, [field]);
         return user ? user[field] : null;
@@ -144,13 +144,11 @@ module.exports = function (User) {
         return users ? users[0] : null;
     };
 
-    //library.js calls this function
     User.getUserData = async function (uid) {
         const users = await User.getUsersData([uid]);
         return users ? users[0] : null;
     };
 
-    //getUserData calls getUsersData which calls getUserFields with an empty array 
     User.getUsersData = async function (uids) {
         return await User.getUsersFields(uids, []);
     };
@@ -200,7 +198,6 @@ module.exports = function (User) {
             if (!user) {
                 return;
             }
-            //console.log("acct type:", user.accounttype);
 
             db.parseIntFields(user, intFields, requestedFields);
 
@@ -220,21 +217,22 @@ module.exports = function (User) {
                 user.picture = User.getDefaultAvatar();
             }
 
-            //i believe hasOwnProperty is if the function is requesting this value returned, 
-            //not whether or not the value is null/empty/etc
+            // I believe hasOwnProperty is if the function is requesting this value returned,
+            // not whether or not the value is null/empty/etc
             if (user.hasOwnProperty('displayGroupTitle')) {
-                if(user.accounttype){
-                    //capitalizing the first letter of the account type (eg. 'student'-> 'Student')
-                    user.displayGroupTitle = user.accounttype.toString().charAt(0).toUpperCase()+ user.accounttype.toString().slice(1);
-                }
-                else{
-                    //default value
-                    user.displayGroupTitle = "Student";
+                if (user.accounttype) {
+                    // Capitalizing the first letter of the account type (eg. 'student'-> 'Student')
+                    user.displayGroupTitle = user.accounttype.toString().charAt(0).toUpperCase();
+                    user.displayGroupTitle += user.accounttype.toString().slice(1);
+                } else {
+                    // Setting a default value
+                    user.displayGroupTitle = 'Student';
                 }
             }
 
-            //Admin is not a account type, it's a group title, so parse group title has been updated to also set displayGroupType 
-            //for admins. (['administrators'] -> 'Administrator')
+            // Admin is not a account type, it's a group title, so
+            // parseGroupTitle has been updated to also set displayGroupType
+            // for admins. (['administrators'] -> 'Administrator')
             if (user.hasOwnProperty('groupTitle') || user.hasOwnProperty('groupTitleArray')) {
                 parseGroupTitle(user);
             }
@@ -317,11 +315,11 @@ module.exports = function (User) {
     function parseGroupTitle(user) {
         try {
             user.groupTitleArray = JSON.parse(user.groupTitle);
-            //setting displayGroupTitle if the user is an admin, since that's stored
-            //in a different place than if they're a student or instructor
-                if(user.groupTitleArray[0] == 'administrators'){
-                    user.displayGroupTitle = 'Administrator';
-                }
+            // Setting displayGroupTitle if the user is an admin, since that's stored
+            // in a different place than if they're a student or instructor
+            if (user.groupTitleArray[0] === 'administrators') {
+                user.displayGroupTitle = 'Administrator';
+            }
         } catch (err) {
             if (user.groupTitle) {
                 user.groupTitleArray = [user.groupTitle];
@@ -333,7 +331,6 @@ module.exports = function (User) {
         if (!Array.isArray(user.groupTitleArray)) {
             if (user.groupTitleArray) {
                 user.groupTitleArray = [user.groupTitleArray];
-                
             } else {
                 user.groupTitleArray = [];
             }

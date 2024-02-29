@@ -103,7 +103,7 @@ module.exports = function (Topics) {
         }
     }
 
-    //HERE. HERE is where user data is being passed to posts i believe.
+    // I think I finally found where user data is passed to posts
     Topics.addPostData = async function (postData, uid) {
         if (!Array.isArray(postData) || !postData.length) {
             return [];

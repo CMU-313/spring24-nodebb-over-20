@@ -104,14 +104,13 @@ module.exports = function (Posts) {
             'uid', 'username', 'fullname', 'userslug',
             'reputation', 'postcount', 'accounttype', 'topiccount', 'picture',
             'signature', 'banned', 'banned:expire', 'status',
-            'lastonline', 'groupTitle', 'mutedUntil', 'displayGroupTitle'
+            'lastonline', 'groupTitle', 'mutedUntil', 'displayGroupTitle',
         ];
         const result = await plugins.hooks.fire('filter:posts.addUserFields', {
             fields: fields,
             uid: uid,
             uids: uids,
         });
-        console.log("result: ", result);
         return await user.getUsersFields(result.uids, _.uniq(result.fields));
     }
 
