@@ -132,6 +132,10 @@ UserObject:
       type: string
       example: '["administrators","Staff"]'
       nullable: true
+    displayGroupTitle:
+      type: string
+      example: "Administrator"
+      nullable: true
     groupTitleArray:
       type: array
       example:

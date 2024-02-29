@@ -14,19 +14,18 @@ define('admin/manage/category', [
     let updateHash = {};
 
     Category.init = function () {
-        console.log('Inside the category.js file');
         $('#category-settings select').each(function () {
             const $this = $(this);
             $this.val($this.attr('data-value'));
-            console.log('This is the correct page');
-        });
 
+        });
         categorySelector.init($('[component="category-selector"]'), {
             onSelect: function (selectedCategory) {
                 ajaxify.go('admin/manage/categories/' + selectedCategory.cid);
             },
             showLinks: true,
         });
+
 
         handleTags();
 
@@ -233,9 +232,6 @@ define('admin/manage/category', [
                 $this.attr('data-disabled', disabled ? 0 : 1);
             }).catch(alerts.error);
         });
-
-        // // Robert - function for searching general discussion
-        // handleCategorySearch();
     };
 
     function modified(el) {
@@ -287,18 +283,6 @@ define('admin/manage/category', [
         });
     }
 
-    // function handleCategorySearch() {
-    //     // make a function that takes an input from the form from category.tpl (the form that searches discussion")
-    //     // this is to test if the function is working, here is the full form code from category.tpl:
-
-    //     // this is the function that takes the input from the form and prints it out on the console
-    //     $('#search-discussion').on('input', function () {
-    //         console.log("Hello World");
-    //         console.log($(this).val());
-    //     });
-    // }
-
-
     Category.launchParentSelector = function () {
         categorySelector.modal({
             onSubmit: function (selectedCategory) {
@@ -315,7 +299,6 @@ define('admin/manage/category', [
                             $('button[data-action="changeParent"]').html(buttonHtml).parent().removeClass('hide');
                         }
                     });
-
                     $('button[data-action="removeParent"]').parent().removeClass('hide');
                     $('button[data-action="setParent"]').addClass('hide');
                 }).catch(alerts.error);
@@ -323,6 +306,5 @@ define('admin/manage/category', [
             showLinks: true,
         });
     };
-
     return Category;
 });

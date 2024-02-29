@@ -126,6 +126,9 @@ get:
                               type: array
                               items:
                                 type: string
+                            displayGroupTitle:
+                              type: string
+                              nullable: true
                             icon:text:
                               type: string
                               description: A single-letter representation of a username. This is used in the

@@ -22,9 +22,16 @@ module.exports = function (Topics) {
 
         const tid = await db.incrObjectField('global', 'nextTid');
 
+        const { anonymous } = data;
+
+        let postUID = data.uid;
+        if (anonymous) {
+            postUID = 0;
+        }
+
         let topicData = {
             tid: tid,
-            uid: data.uid,
+            uid: postUID,
             cid: data.cid,
             mainPid: 0,
             title: data.title,

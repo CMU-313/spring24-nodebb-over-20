@@ -37,12 +37,15 @@ topicsAPI.create = async function (caller, data) {
         throw new Error('[[error:invalid-data]]');
     }
 
+    const topicUID = caller.uid;
+
     const payload = { ...data };
     payload.tags = payload.tags || [];
     apiHelpers.setDefaultPostData(caller, payload);
     const isScheduling = parseInt(data.timestamp, 10) > payload.timestamp;
+
     if (isScheduling) {
-        if (await privileges.categories.can('topics:schedule', data.cid, caller.uid)) {
+        if (await privileges.categories.can('topics:schedule', data.cid, topicUID)) {
             payload.timestamp = parseInt(data.timestamp, 10);
         } else {
             throw new Error('[[error:no-privileges]]');
@@ -50,7 +53,7 @@ topicsAPI.create = async function (caller, data) {
     }
 
     await meta.blacklist.test(caller.ip);
-    const shouldQueue = await posts.shouldQueue(caller.uid, payload);
+    const shouldQueue = await posts.shouldQueue(topicUID, payload);
     if (shouldQueue) {
         return await posts.addToQueue(payload);
     }
@@ -58,9 +61,9 @@ topicsAPI.create = async function (caller, data) {
     const result = await topics.post(payload);
     await topics.thumbs.migrate(data.uuid, result.topicData.tid);
 
-    socketHelpers.emitToUids('event:new_post', { posts: [result.postData] }, [caller.uid]);
-    socketHelpers.emitToUids('event:new_topic', result.topicData, [caller.uid]);
-    socketHelpers.notifyNew(caller.uid, 'newTopic', { posts: [result.postData], topic: result.topicData });
+    socketHelpers.emitToUids('event:new_post', { posts: [result.postData] }, [topicUID]);
+    socketHelpers.emitToUids('event:new_topic', result.topicData, [topicUID]);
+    socketHelpers.notifyNew(topicUID, 'newTopic', { posts: [result.postData], topic: result.topicData });
 
     return result.topicData;
 };
@@ -70,16 +73,19 @@ topicsAPI.reply = async function (caller, data) {
         throw new Error('[[error:invalid-data]]');
     }
     const payload = { ...data };
+
     apiHelpers.setDefaultPostData(caller, payload);
 
+    const replyUID = caller.uid;
+
     await meta.blacklist.test(caller.ip);
-    const shouldQueue = await posts.shouldQueue(caller.uid, payload);
+    const shouldQueue = await posts.shouldQueue(replyUID, payload);
     if (shouldQueue) {
         return await posts.addToQueue(payload);
     }
 
     const postData = await topics.reply(payload); // postData seems to be a subset of postObj, refactor?
-    const postObj = await posts.getPostSummaryByPids([postData.pid], caller.uid, {});
+    const postObj = await posts.getPostSummaryByPids([postData.pid], replyUID, {});
 
     const result = {
         posts: [postData],
@@ -88,13 +94,14 @@ topicsAPI.reply = async function (caller, data) {
     };
 
     user.updateOnlineUsers(caller.uid);
-    if (caller.uid) {
-        socketHelpers.emitToUids('event:new_post', result, [caller.uid]);
-    } else if (caller.uid === 0) {
+    if (replyUID) {
+        console.log('emit to uids', [replyUID]);
+        socketHelpers.emitToUids('event:new_post', result, [replyUID]);
+    } else if (replyUID === 0) {
         websockets.in('online_guests').emit('event:new_post', result);
     }
 
-    socketHelpers.notifyNew(caller.uid, 'newPost', result);
+    socketHelpers.notifyNew(replyUID, 'newPost', result);
 
     return postObj[0];
 };
