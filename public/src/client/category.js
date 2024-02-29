@@ -59,12 +59,13 @@ define('forum/category', [
         $('.search select, .search input[type="checkbox"]').on('change', doDiscSearch);
     };
     function doDiscSearch() {
-        console.log('Function that is doing the search is now active');
+        console.log('Search function ran');
         $('[component="user/search/icon"]').removeClass('fa-search').addClass('fa-spinner fa-spin');
         const searchPrompt = $('#search-discussion').val().trim(); // Trim the search prompt to remove leading and trailing spaces
         if (!searchPrompt) {
             displayErrorMessage('Please enter a search term.');
         }
+        console.log('The prompt is ' + searchPrompt);
     }
     function displayErrorMessage(message) {
         // Display error message to the user
