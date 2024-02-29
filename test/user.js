@@ -95,6 +95,8 @@ describe('User', () => {
             assert.strictEqual(data.postcount, 0);
             assert.strictEqual(data.topiccount, 0);
             assert.strictEqual(data.lastposttime, 0);
+            assert.strictEqual(data.accounttype, 'student');
+            assert.strictEqual(data.displayGroupTitle, 'Student')
             assert.strictEqual(data.banned, false);
         });
 
