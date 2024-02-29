@@ -3,7 +3,9 @@ const db = require('../database');
 // TODO test
 module.exports = function (Posts) {
     Posts.getPidsByContent = async function (content) {
-
+        assert(typeof content == "string");
+        
+        
         // Presumably returns an array of pids
         const pids = await db.scan({ match: `posts:pid:*` });    
         const filteredPids = []
@@ -22,7 +24,7 @@ module.exports = function (Posts) {
                 filteredPids.push(pids[i])
             }
         }
-
+        assert(Array.isArray(filteredPids))
         return filteredPids
 
     }

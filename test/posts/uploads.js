@@ -62,6 +62,15 @@ describe('upload methods', () => {
         purgePid = purgePostData.postData.pid;
     });
 
+    // ! IDK if this is right
+    describe('.getPidsByContent()', () => {
+        it('should return proper pids', (done) => {
+            const pids = posts.search.getPidsByContent("here");
+            assert(pids == [pid, purgePid]);
+            done();
+        })
+    })
+
     describe('.sync()', () => {
         it('should properly add new images to the post\'s zset', (done) => {
             posts.uploads.sync(pid, (err) => {

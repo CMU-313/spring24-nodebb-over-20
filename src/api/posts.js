@@ -44,6 +44,8 @@ postsAPI.get = async function (caller, data) {
 
 // TODO test
 postsAPI.getPosts = async function (caller, data) {
+    assert(typeof data == "object");
+    assert(typeof caller == "object");
     let out = []
     const pids = posts.getPidsByContent(data.query);
     for (let i = 0; i < pids.length; i++) {
@@ -51,6 +53,7 @@ postsAPI.getPosts = async function (caller, data) {
         newData.pid = pids[i];
         out.push(postsAPI.get(caller, newData));
     }
+    assert(Array.isArray(out));
     return out;
 }
 
