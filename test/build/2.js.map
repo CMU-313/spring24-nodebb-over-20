@@ -1,0 +1,1 @@
+{"version":3,"sources":["2.js"],"names":["foo","name","age"],"mappings":"AAAA,SAASA,IAAIC,EAAMC,GACf,MAAO,wBAA0BD,EAAO,QAAUC,EAAM","file":"2.js","sourcesContent":["function foo(name, age) {\n    return 'The person known as \"' + name + '\" is ' + age + ' years old';\n}\n"]}
