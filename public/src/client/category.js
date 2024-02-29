@@ -36,9 +36,7 @@ define('forum/category', [
 
         if (ajaxify.data.slug === '2/general-discussion') {
             Category.handleSearch();
-        
         }
-
         handleScrollToTopicIndex();
 
         handleIgnoreWatch(cid);
@@ -56,7 +54,7 @@ define('forum/category', [
         hooks.fire('action:category.loaded', { cid: ajaxify.data.cid });
     };
 
-    Category.handleSearch = function (params) {
+    Category.handleSearch = function () {
         $('#search-discussion').on('keyup', utils.debounce(doDiscSearch, 250));
         $('.search select, .search input[type="checkbox"]').on('change', doDiscSearch);
     };
@@ -64,24 +62,18 @@ define('forum/category', [
         console.log('Function that is doing the search is now active');
         $('[component="user/search/icon"]').removeClass('fa-search').addClass('fa-spinner fa-spin');
         const searchPrompt = $('#search-discussion').val().trim(); // Trim the search prompt to remove leading and trailing spaces
-        
         if (!searchPrompt) {
-            // If search prompt is empty, display an error message
             displayErrorMessage('Please enter a search term.');
-            return;
         }
     }
-    
     function displayErrorMessage(message) {
         // Display error message to the user
         const errorContainer = $('#search-error-message');
         errorContainer.text(message).addClass('search-error-visible');
-        setTimeout(function() {
+        setTimeout(function () {
             errorContainer.removeClass('search-error-visible').text('');
         }, 3000); // Hide the error message after 3 seconds
     }
-    
-
     function handleScrollToTopicIndex() {
         let topicIndex = ajaxify.data.topicIndex;
         if (topicIndex && utils.isNumber(topicIndex)) {
@@ -91,7 +83,6 @@ define('forum/category', [
             }
         }
     }
-
     function handleIgnoreWatch(cid) {
         $('[component="category/watching"], [component="category/ignoring"], [component="category/notwatching"]').on('click', function () {
             const $this = $(this);

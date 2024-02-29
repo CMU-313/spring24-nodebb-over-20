@@ -33,7 +33,7 @@ define('forum/users', [
         if (!ajaxify.data.template.users) {
             return;
         }
-        console.log('Doing search')
+        console.log('Doing search');
         $('[component="user/search/icon"]').removeClass('fa-search').addClass('fa-spinner fa-spin');
         const username = $('#search-user').val();
         const activeSection = getActiveSection();
