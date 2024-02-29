@@ -453,10 +453,9 @@ describe('search methods', () => {
         purgePid = purgePostData.postData.pid;
     });
 
-    // ! IDK if this is right
     describe('.getPidsByContent()', () => {
         it('should return proper pids', (done) => {
-            const pids = posts.search.getPidsByContent('here');
+            const pids = posts.getPidsByContent('here');
             console.assert(pids[0] === pid && pids[1] === purgePid);
             done();
         });

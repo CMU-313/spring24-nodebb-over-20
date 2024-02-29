@@ -42,7 +42,6 @@ postsAPI.get = async function (caller, data) {
     return post;
 };
 
-// TODO test
 postsAPI.getPosts = async function (caller, data) {
     console.assert(typeof data === 'object');
     console.assert(typeof caller === 'object');
