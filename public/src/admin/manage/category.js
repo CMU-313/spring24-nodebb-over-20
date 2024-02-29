@@ -11,20 +11,17 @@ define('admin/manage/category', [
 ], function (uploader, iconSelect, categorySelector, Benchpress, api, bootbox, alerts) {
     const Category = {};
     let updateHash = {};
-
     Category.init = function () {
         $('#category-settings select').each(function () {
             const $this = $(this);
             $this.val($this.attr('data-value'));
         });
-
         categorySelector.init($('[component="category-selector"]'), {
             onSelect: function (selectedCategory) {
                 ajaxify.go('admin/manage/categories/' + selectedCategory.cid);
             },
             showLinks: true,
         });
-
         handleTags();
 
         $('#category-settings input, #category-settings select, #category-settings textarea').on('change', function (ev) {
@@ -231,7 +228,6 @@ define('admin/manage/category', [
             }).catch(alerts.error);
         });
     };
-
     function modified(el) {
         let value;
         if ($(el).is(':checkbox')) {
@@ -280,7 +276,6 @@ define('admin/manage/category', [
             modified(tagEl);
         });
     }
-
     Category.launchParentSelector = function () {
         categorySelector.modal({
             onSubmit: function (selectedCategory) {
@@ -297,7 +292,6 @@ define('admin/manage/category', [
                             $('button[data-action="changeParent"]').html(buttonHtml).parent().removeClass('hide');
                         }
                     });
-
                     $('button[data-action="removeParent"]').parent().removeClass('hide');
                     $('button[data-action="setParent"]').addClass('hide');
                 }).catch(alerts.error);
@@ -305,6 +299,5 @@ define('admin/manage/category', [
             showLinks: true,
         });
     };
-
     return Category;
 });

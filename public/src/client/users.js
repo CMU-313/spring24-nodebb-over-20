@@ -1,6 +1,5 @@
 'use strict';
 
-
 define('forum/users', [
     'translator', 'benchpress', 'api', 'alerts', 'accounts/invite',
 ], function (translator, Benchpress, api, alerts, AccountInvite) {
@@ -10,6 +9,7 @@ define('forum/users', [
 
     Users.init = function () {
         app.enterRoom('user_list');
+        console.log('Entered Users.js file');
 
         const section = utils.param('section') ? ('?section=' + utils.param('section')) : '';
         $('.nav-pills li').removeClass('active').find('a[href="' + window.location.pathname + section + '"]').parent()
@@ -33,9 +33,11 @@ define('forum/users', [
         if (!ajaxify.data.template.users) {
             return;
         }
+        console.log('Doing search');
         $('[component="user/search/icon"]').removeClass('fa-search').addClass('fa-spinner fa-spin');
         const username = $('#search-user').val();
         const activeSection = getActiveSection();
+        console.log(username);
 
         const query = {
             section: activeSection,

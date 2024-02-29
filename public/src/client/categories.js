@@ -1,6 +1,5 @@
 'use strict';
 
-
 define('forum/categories', ['components', 'categorySelector', 'hooks'], function (components, categorySelector, hooks) {
     const categories = {};
 
@@ -12,7 +11,7 @@ define('forum/categories', ['components', 'categorySelector', 'hooks'], function
 
     categories.init = function () {
         app.enterRoom('categories');
-
+        // categories.handleSearch();
         socket.removeListener('event:new_post', categories.onNewPost);
         socket.on('event:new_post', categories.onNewPost);
         categorySelector.init($('[component="category-selector"]'), {
@@ -21,12 +20,10 @@ define('forum/categories', ['components', 'categorySelector', 'hooks'], function
                 ajaxify.go('/category/' + category.cid);
             },
         });
-
         $('.category-header').tooltip({
             placement: 'bottom',
         });
     };
-
     categories.onNewPost = function (data) {
         if (data && data.posts && data.posts.length && data.posts[0].topic) {
             renderNewPost(data.posts[0].topic.cid, data.posts[0]);

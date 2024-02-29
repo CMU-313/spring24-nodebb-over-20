@@ -22,7 +22,6 @@ define('forum/category', [
         const cid = ajaxify.data.cid;
 
         app.enterRoom('category_' + cid);
-
         share.addShareHandlers(ajaxify.data.name);
 
         topicList.init('category', loadTopicsAfter);
@@ -35,6 +34,9 @@ define('forum/category', [
             navigator.disable();
         }
 
+        if (ajaxify.data.slug === '2/general-discussion') {
+            Category.handleSearch();
+        }
         handleScrollToTopicIndex();
 
         handleIgnoreWatch(cid);
@@ -48,11 +50,31 @@ define('forum/category', [
                 ajaxify.go('/category/' + category.cid);
             },
         });
-
         hooks.fire('action:topics.loaded', { topics: ajaxify.data.topics });
         hooks.fire('action:category.loaded', { cid: ajaxify.data.cid });
     };
 
+    Category.handleSearch = function () {
+        $('#search-discussion').on('keyup', utils.debounce(doDiscSearch, 250));
+        $('.search select, .search input[type="checkbox"]').on('change', doDiscSearch);
+    };
+    function doDiscSearch() {
+        console.log('Search function ran');
+        $('[component="user/search/icon"]').removeClass('fa-search').addClass('fa-spinner fa-spin');
+        const searchPrompt = $('#search-discussion').val().trim(); // Trim the search prompt to remove leading and trailing spaces
+        if (!searchPrompt) {
+            displayErrorMessage('Please enter a search term.');
+        }
+        console.log('The prompt is ' + searchPrompt);
+    }
+    function displayErrorMessage(message) {
+        // Display error message to the user
+        const errorContainer = $('#search-error-message');
+        errorContainer.text(message).addClass('search-error-visible');
+        setTimeout(function () {
+            errorContainer.removeClass('search-error-visible').text('');
+        }, 3000); // Hide the error message after 3 seconds
+    }
     function handleScrollToTopicIndex() {
         let topicIndex = ajaxify.data.topicIndex;
         if (topicIndex && utils.isNumber(topicIndex)) {
@@ -62,7 +84,6 @@ define('forum/category', [
             }
         }
     }
-
     function handleIgnoreWatch(cid) {
         $('[component="category/watching"], [component="category/ignoring"], [component="category/notwatching"]').on('click', function () {
             const $this = $(this);

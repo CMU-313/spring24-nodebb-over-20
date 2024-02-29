@@ -88,7 +88,6 @@ define('admin/manage/categories', [
             el.closest('[data-cid]').find('> ul[data-cid]').toggleClass('hidden', !expand);
         }
     };
-
     Categories.throwCreateModal = function () {
         Benchpress.render('admin/partials/categories/create', {}).then(function (html) {
             const modal = bootbox.dialog({
