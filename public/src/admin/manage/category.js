@@ -14,8 +14,6 @@ define('admin/manage/category', [
    
 
     Category.init = function () {
-
-        console.log("Inside the category.js file")
         $('#category-settings select').each(function () {
             const $this = $(this);
             $this.val($this.attr('data-value'));
@@ -23,16 +21,12 @@ define('admin/manage/category', [
         });
         // // Robert - adding functions that routes
         //  Category.handleSearch();
-
-
         categorySelector.init($('[component="category-selector"]'), {
             onSelect: function (selectedCategory) {
                 ajaxify.go('admin/manage/categories/' + selectedCategory.cid);
             },
             showLinks: true,
         });
-
-
         handleTags();
 
         $('#category-settings input, #category-settings select, #category-settings textarea').on('change', function (ev) {

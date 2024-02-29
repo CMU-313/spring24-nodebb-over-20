@@ -410,12 +410,10 @@ define('admin/manage/users', [
         handleSort();
         handleFilter();
         AccountInvite.handle();
-        console.log("User search");
     };
 
     function handleSearch() {
         function doSearch() {
-            console.log("doSearch activated");
             $('.fa-spinner').removeClass('hidden');
             loadSearchPage({
                 searchBy: $('#user-search-by').val(),
