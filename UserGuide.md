@@ -26,6 +26,17 @@
 ## How to use feature
 
 - The Anonymous posting functionality allows users to post topics and replies as guests, thus leaving no user information to any other user on the platform to observe. The functionality is implemented as a new post composer plugin that supports the functionality; users need to load the plugin with the compatible NodeB codebase to activate the functionality.
+
+- First, since the anonymous post composer is a submodule in this directory, make sure the submodule is cloned together with the main repository using the following commands:
+
+``` shell
+# if not cloned yet
+$ git clone 'this repository'
+ 
+$ git submodule init
+$ git submodule update
+```
+
 - To use the beta anonymous posting feature, users need to first link the beta anonymous post composer using the following commands:
 
 ``` shell
