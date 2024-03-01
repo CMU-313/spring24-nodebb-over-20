@@ -58,6 +58,7 @@ define('forum/category', [
         $('#search-discussion').on('keyup', utils.debounce(doDiscSearch, 250));
         $('.search select, .search input[type="checkbox"]').on('change', doDiscSearch);
     };
+
     function doDiscSearch() {
         console.log('Search function ran');
         $('[component="user/search/icon"]').removeClass('fa-search').addClass('fa-spinner fa-spin');
@@ -67,6 +68,7 @@ define('forum/category', [
         }
         console.log('The prompt is ' + searchPrompt);
     }
+
     function displayErrorMessage(message) {
         // Display error message to the user
         const errorContainer = $('#search-error-message');
@@ -75,6 +77,7 @@ define('forum/category', [
             errorContainer.removeClass('search-error-visible').text('');
         }, 3000); // Hide the error message after 3 seconds
     }
+
     function handleScrollToTopicIndex() {
         let topicIndex = ajaxify.data.topicIndex;
         if (topicIndex && utils.isNumber(topicIndex)) {

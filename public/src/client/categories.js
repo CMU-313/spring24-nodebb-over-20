@@ -24,6 +24,7 @@ define('forum/categories', ['components', 'categorySelector', 'hooks'], function
             placement: 'bottom',
         });
     };
+
     categories.onNewPost = function (data) {
         if (data && data.posts && data.posts.length && data.posts[0].topic) {
             renderNewPost(data.posts[0].topic.cid, data.posts[0]);

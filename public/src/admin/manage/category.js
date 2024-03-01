@@ -1,5 +1,6 @@
 'use strict';
 
+// const posts = require("../../../../src/posts");
 define('admin/manage/category', [
     'uploader',
     'iconSelect',
@@ -11,6 +12,7 @@ define('admin/manage/category', [
 ], function (uploader, iconSelect, categorySelector, Benchpress, api, bootbox, alerts) {
     const Category = {};
     let updateHash = {};
+
     Category.init = function () {
         $('#category-settings select').each(function () {
             const $this = $(this);
@@ -22,6 +24,8 @@ define('admin/manage/category', [
             },
             showLinks: true,
         });
+
+
         handleTags();
 
         $('#category-settings input, #category-settings select, #category-settings textarea').on('change', function (ev) {
@@ -228,6 +232,7 @@ define('admin/manage/category', [
             }).catch(alerts.error);
         });
     };
+
     function modified(el) {
         let value;
         if ($(el).is(':checkbox')) {
@@ -276,6 +281,7 @@ define('admin/manage/category', [
             modified(tagEl);
         });
     }
+
     Category.launchParentSelector = function () {
         categorySelector.modal({
             onSubmit: function (selectedCategory) {

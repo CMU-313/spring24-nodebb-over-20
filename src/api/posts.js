@@ -42,6 +42,20 @@ postsAPI.get = async function (caller, data) {
     return post;
 };
 
+postsAPI.getPosts = async function (caller, data) {
+    console.assert(typeof data === 'object');
+    console.assert(typeof caller === 'object');
+    const out = [];
+    const pids = posts.getPidsByContent(data.query);
+    for (let i = 0; i < pids.length; i++) {
+        const newData = data;
+        newData.pid = pids[i];
+        out.push(postsAPI.get(caller, newData));
+    }
+    console.assert(Array.isArray(out));
+    return out;
+};
+
 postsAPI.edit = async function (caller, data) {
     if (!data || !data.pid || (meta.config.minimumPostLength !== 0 && !data.content)) {
         throw new Error('[[error:invalid-data]]');

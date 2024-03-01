@@ -415,3 +415,49 @@ describe('post uploads management', () => {
         });
     });
 });
+
+describe('search methods', () => {
+    let pid;
+    let purgePid;
+    let cid;
+    let uid;
+
+    before(async () => {
+        _recreateFiles();
+
+        uid = await user.create({
+            username: 'uploads user',
+            password: 'abracadabra',
+            gdpr_consent: 1,
+        });
+
+        ({ cid } = await categories.create({
+            name: 'Test Category',
+            description: 'Test category created by testing script',
+        }));
+
+        const topicPostData = await topics.post({
+            uid,
+            cid,
+            title: 'topic with some images',
+            content: 'here is an image [alt text](/assets/uploads/files/abracadabra.png) and another [alt text](/assets/uploads/files/shazam.jpg)',
+        });
+        pid = topicPostData.postData.pid;
+
+        const purgePostData = await topics.post({
+            uid,
+            cid,
+            title: 'topic with some images, to be purged',
+            content: 'here is an image [alt text](/assets/uploads/files/whoa.gif) and another [alt text](/assets/uploads/files/amazeballs.jpg)',
+        });
+        purgePid = purgePostData.postData.pid;
+    });
+
+    describe('.getPidsByContent()', () => {
+        it('should return proper pids', (done) => {
+            const pids = posts.getPidsByContent('here');
+            console.assert(pids[0] === pid && pids[1] === purgePid);
+            done();
+        });
+    });
+});
