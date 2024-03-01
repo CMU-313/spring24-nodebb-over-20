@@ -4,6 +4,7 @@
 const topics = require('../topics');
 const user = require('../user');
 const utils = require('../utils');
+const db = require('../database');
 
 module.exports = function (Posts) {
     Posts.getPostsFromSet = async function (set, start, stop, uid, reverse) {
