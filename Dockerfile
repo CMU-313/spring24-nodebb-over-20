@@ -4,6 +4,8 @@ RUN mkdir -p /usr/src/app && \
     chown -R node:node /usr/src/app
 WORKDIR /usr/src/app
 
+ENV HOST 0.0.0.0
+
 ARG NODE_ENV
 ENV NODE_ENV $NODE_ENV
 
