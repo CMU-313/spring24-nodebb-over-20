@@ -16,6 +16,8 @@ WORKDIR /usr/src/app
 ARG NODE_ENV
 ENV NODE_ENV $NODE_ENV
 
+COPY --chown=node:node /usr/src/app/plugins/spring24-nodebb-over-20-anonymous-composer /usr/src/app/plugins/spring24-nodebb-over-20-anonymous-composer
+
 COPY --chown=node:node install/package.json /usr/src/app/package.json
 
 USER node
