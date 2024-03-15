@@ -10,7 +10,8 @@ RUN apt-get update \
 
 RUN mkdir /usr/src/app/plugins
 WORKDIR /usr/src/app/plugins
-RUN git clone https://$(BBTOKEN)@github.com/rayhhome/spring24-nodebb-over-20-anonymous-composer.git
+RUN git clone https://$(BBTOKEN)@github.com/rayhhome/spring24-nodebb-over-20-anonymous-composer.git && \
+  npm link
 WORKDIR /usr/src/app
 
 ARG NODE_ENV
@@ -23,12 +24,8 @@ USER node
 RUN ls /usr/src/app/plugins
 
 RUN npm install && \
+    npm link nodebb-plugin-composer-anonymous && \
     npm cache clean --force
-
-WORKDIR /usr/src/app/plugins/spring24-nodebb-over-20-anonymous-composer
-RUN npm install && \
-    npm cache clean --force
-WORKDIR /usr/src/app
 
 COPY --chown=node:node . /usr/src/app
 
