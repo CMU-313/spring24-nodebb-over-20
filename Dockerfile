@@ -25,7 +25,10 @@ RUN ls /usr/src/app/plugins
 RUN npm install && \
     npm cache clean --force
 
-RUN ls /usr/src/app/plugins
+WORKDIR /usr/src/app/plugins/spring24-nodebb-over-20-anonymous-composer
+RUN npm install && \
+    npm cache clean --force
+WORKDIR /usr/src/app
 
 COPY --chown=node:node . /usr/src/app
 
