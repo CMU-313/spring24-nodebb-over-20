@@ -10,8 +10,9 @@ RUN apt-get update \
 
 RUN mkdir /usr/src/app/plugins
 WORKDIR /usr/src/app/plugins
-RUN git clone https://$(BBTOKEN)@github.com/rayhhome/spring24-nodebb-over-20-anonymous-composer.git && \
-  npm link
+RUN git clone https://$(BBTOKEN)@github.com/rayhhome/spring24-nodebb-over-20-anonymous-composer.git
+WORKDIR /usr/src/app/plugins/spring24-nodebb-over-20-anonymous-composer
+RUN npm link
 WORKDIR /usr/src/app
 
 ARG NODE_ENV
