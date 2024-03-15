@@ -4,12 +4,12 @@ RUN mkdir -p /usr/src/app && \
     chown -R node:node /usr/src/app
 WORKDIR /usr/src/app
 
-RUN apt-get update \ 
-    && apt-get install -y jq \
-    && apt-get clean
+RUN apt-get update && apt-get install -y jq
 
 ARG NODE_ENV
 ENV NODE_ENV $NODE_ENV
+
+COPY --chown=node:node install/package.json /usr/src/app/package.json
 
 USER node
 
