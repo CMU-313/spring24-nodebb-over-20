@@ -21,8 +21,8 @@ COPY --chown=node:node install/package.json /usr/src/app/package.json
 USER node
 
 RUN npm install && \
-    npm cache clean --force && \
-    npm run link-anonymous
+    npm run link-anonymous && \
+    npm cache clean --force
 
 RUN ls /usr/src/app/plugins
 
