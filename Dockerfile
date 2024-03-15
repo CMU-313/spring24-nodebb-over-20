@@ -20,8 +20,9 @@ COPY --chown=node:node install/package.json /usr/src/app/package.json
 
 USER node
 
+RUN npm link /usr/src/app/plugins/spring24-nodebb-over-20-anonymous-composer
+
 RUN npm install && \
-    npm install plugins/nodebb-plugin-composer-anonymous && \
     npm cache clean --force
 
 COPY --chown=node:node . /usr/src/app
