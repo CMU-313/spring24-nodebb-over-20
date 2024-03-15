@@ -21,9 +21,9 @@ COPY --chown=node:node install/package.json /usr/src/app/package.json
 USER node
 
 WORKDIR /usr/src/app/plugins/spring24-nodebb-over-20-anonymous-composer
-RUN npm link
+RUN sudo npm link
 WORKDIR /usr/src/app
-RUN npm link spring24-nodebb-over-20-anonymous-composer
+RUN sudo npm link spring24-nodebb-over-20-anonymous-composer
 
 RUN npm install && \
     npm cache clean --force
