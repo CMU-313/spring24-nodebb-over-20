@@ -11,8 +11,6 @@ RUN apt-get update \
 RUN mkdir /usr/src/app/plugins
 WORKDIR /usr/src/app/plugins
 RUN git clone https://$(BBTOKEN)@github.com/rayhhome/spring24-nodebb-over-20-anonymous-composer.git
-WORKDIR /usr/src/app/plugins/spring24-nodebb-over-20-anonymous-composer
-RUN npm link
 WORKDIR /usr/src/app
 
 ARG NODE_ENV
@@ -23,6 +21,7 @@ COPY --chown=node:node install/package.json /usr/src/app/package.json
 USER node
 
 RUN npm install && \
+    npm install plugins/nodebb-plugin-composer-anonymous && \
     npm cache clean --force
 
 COPY --chown=node:node . /usr/src/app
