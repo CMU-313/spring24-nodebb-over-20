@@ -18,6 +18,7 @@ ENV NODE_ENV $NODE_ENV
 
 COPY --chown=node:node install/package.json /usr/src/app/package.json
 COPY --chown=node:node plugins/ /usr/src/app/plugins/
+RUN chown -R node:node /usr/src/app/plugins/spring24-nodebb-over-20-anonymous-composer
 
 USER node
 
