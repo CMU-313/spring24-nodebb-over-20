@@ -25,6 +25,12 @@ if [[ -z "${DEPLOYMENT_URL+x}" ]]; then
   exit 1
 fi
 
+if [[ -z "${BBTOKEN+x}" ]]; then
+  # var is not defined
+  echo "Error: BBTOKEN is not defined!"
+  exit 1
+fi
+
 # Read the JSON file
 json_data=$(cat "/usr/src/app/config_template.json")
 
