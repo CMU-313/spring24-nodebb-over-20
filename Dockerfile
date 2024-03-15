@@ -22,10 +22,7 @@ COPY --chown=node:node install/package.json /usr/src/app/package.json
 
 USER node
 
-RUN ls /usr/src/app/plugins
-
 RUN npm install && \
-    npm link nodebb-plugin-composer-anonymous && \
     npm cache clean --force
 
 COPY --chown=node:node . /usr/src/app
