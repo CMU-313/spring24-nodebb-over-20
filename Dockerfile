@@ -13,17 +13,17 @@ WORKDIR /usr/src/app/plugins
 RUN git clone https://$(BBTOKEN)@github.com/rayhhome/spring24-nodebb-over-20-anonymous-composer.git
 WORKDIR /usr/src/app
 
+WORKDIR /usr/src/app/plugins/spring24-nodebb-over-20-anonymous-composer
+RUN npm link
+WORKDIR /usr/src/app
+RUN npm link spring24-nodebb-over-20-anonymous-composer
+
 ARG NODE_ENV
 ENV NODE_ENV $NODE_ENV
 
 COPY --chown=node:node install/package.json /usr/src/app/package.json
 
 USER node
-
-WORKDIR /usr/src/app/plugins/spring24-nodebb-over-20-anonymous-composer
-RUN sudo npm link
-WORKDIR /usr/src/app
-RUN sudo npm link spring24-nodebb-over-20-anonymous-composer
 
 RUN npm install && \
     npm cache clean --force
