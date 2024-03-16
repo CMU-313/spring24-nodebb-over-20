@@ -1,3 +1,7 @@
+// This is the test file for Iroh used as an example in the Iroh documentation.
+// This was brought from the Iroh documentation and is not my own work.
+// the source is here https://maierfelix.github.io/Iroh/examples/node.js/index.js
+
 const Iroh = require("iroh");
 
 let stage = new Iroh.Stage(`
