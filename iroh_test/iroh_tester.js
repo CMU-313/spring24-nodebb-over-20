@@ -1,3 +1,7 @@
+// Testing for Iroh, a JavaScript code coverage tool, code brought from Node.JS example from 
+// https://maierfelix.github.io/Iroh/examples/node.js/index.js
+
+// All credit due to the above link
 const Iroh = require("iroh");
 
 let stage = new Iroh.Stage(`
