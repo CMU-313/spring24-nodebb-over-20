@@ -491,7 +491,7 @@ async function enableDefaultPlugins() {
     console.log('Enabling default plugins');
 
     let defaultEnabled = [
-        'nodebb-plugin-composer-anonymous',
+        'nodebb-plugin-composer-default',
         'nodebb-plugin-markdown',
         'nodebb-plugin-mentions',
         'nodebb-widget-essentials',
