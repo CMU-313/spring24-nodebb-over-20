@@ -1,6 +1,6 @@
-'use strict';
+'use strict'
 
-const db = require('../../database');
+const db = require('../../database')
 
 module.exports = {
     name: 'Set default allowed file extensions',
@@ -8,9 +8,14 @@ module.exports = {
     method: function (callback) {
         db.getObjectField('config', 'allowedFileExtensions', (err, value) => {
             if (err || value) {
-                return callback(err);
+                return callback(err)
             }
-            db.setObjectField('config', 'allowedFileExtensions', 'png,jpg,bmp', callback);
-        });
+            db.setObjectField(
+                'config',
+                'allowedFileExtensions',
+                'png,jpg,bmp',
+                callback
+            )
+        })
     },
-};
+}

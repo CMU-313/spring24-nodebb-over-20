@@ -1,9 +1,11 @@
 # Command
+
 ```bash
 npx prettier . --check
 ```
 
 # Output
+
 ```bash
 Checking formatting...
 [warn] .codeclimate.yml

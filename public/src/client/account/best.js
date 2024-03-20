@@ -1,16 +1,20 @@
-'use strict';
+'use strict'
 
-
-define('forum/account/best', ['forum/account/header', 'forum/account/posts'], function (header, posts) {
-    const Best = {};
+define('forum/account/best', [
+    'forum/account/header',
+    'forum/account/posts',
+], function (header, posts) {
+    const Best = {}
 
     Best.init = function () {
-        header.init();
+        header.init()
 
-        $('[component="post/content"] img:not(.not-responsive)').addClass('img-responsive');
+        $('[component="post/content"] img:not(.not-responsive)').addClass(
+            'img-responsive'
+        )
 
-        posts.handleInfiniteScroll('account/best');
-    };
+        posts.handleInfiniteScroll('account/best')
+    }
 
-    return Best;
-});
+    return Best
+})

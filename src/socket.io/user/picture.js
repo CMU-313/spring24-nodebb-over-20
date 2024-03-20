@@ -1,26 +1,26 @@
-'use strict';
+'use strict'
 
-const user = require('../../user');
-const plugins = require('../../plugins');
+const user = require('../../user')
+const plugins = require('../../plugins')
 
 module.exports = function (SocketUser) {
     SocketUser.removeUploadedPicture = async function (socket, data) {
         if (!socket.uid || !data || !data.uid) {
-            throw new Error('[[error:invalid-data]]');
+            throw new Error('[[error:invalid-data]]')
         }
-        await user.isAdminOrSelf(socket.uid, data.uid);
+        await user.isAdminOrSelf(socket.uid, data.uid)
         // 'keepAllUserImages' is ignored, since there is explicit user intent
-        const userData = await user.removeProfileImage(data.uid);
+        const userData = await user.removeProfileImage(data.uid)
         plugins.hooks.fire('action:user.removeUploadedPicture', {
             callerUid: socket.uid,
             uid: data.uid,
             user: userData,
-        });
-    };
+        })
+    }
 
     SocketUser.getProfilePictures = async function (socket, data) {
         if (!data || !data.uid) {
-            throw new Error('[[error:invalid-data]]');
+            throw new Error('[[error:invalid-data]]')
         }
 
         const [list, uploaded] = await Promise.all([
@@ -29,16 +29,16 @@ module.exports = function (SocketUser) {
                 pictures: [],
             }),
             user.getUserField(data.uid, 'uploadedpicture'),
-        ]);
+        ])
 
         if (uploaded) {
             list.pictures.push({
                 type: 'uploaded',
                 url: uploaded,
                 text: '[[user:uploaded_picture]]',
-            });
+            })
         }
 
-        return list.pictures;
-    };
-};
+        return list.pictures
+    }
+}

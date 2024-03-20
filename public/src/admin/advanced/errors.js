@@ -1,39 +1,47 @@
-'use strict';
+'use strict'
 
-
-define('admin/advanced/errors', ['bootbox', 'alerts', 'Chart'], function (bootbox, alerts, Chart) {
-    const Errors = {};
+define('admin/advanced/errors', ['bootbox', 'alerts', 'Chart'], function (
+    bootbox,
+    alerts,
+    Chart
+) {
+    const Errors = {}
 
     Errors.init = function () {
-        Errors.setupCharts();
+        Errors.setupCharts()
 
-        $('[data-action="clear"]').on('click', Errors.clear404);
-    };
+        $('[data-action="clear"]').on('click', Errors.clear404)
+    }
 
     Errors.clear404 = function () {
-        bootbox.confirm('[[admin/advanced/errors:clear404-confirm]]', function (ok) {
-            if (ok) {
-                socket.emit('admin.errors.clear', {}, function (err) {
-                    if (err) {
-                        return alerts.error(err);
-                    }
+        bootbox.confirm(
+            '[[admin/advanced/errors:clear404-confirm]]',
+            function (ok) {
+                if (ok) {
+                    socket.emit('admin.errors.clear', {}, function (err) {
+                        if (err) {
+                            return alerts.error(err)
+                        }
 
-                    ajaxify.refresh();
-                    alerts.success('[[admin/advanced/errors:clear404-success]]');
-                });
+                        ajaxify.refresh()
+                        alerts.success(
+                            '[[admin/advanced/errors:clear404-success]]'
+                        )
+                    })
+                }
             }
-        });
-    };
+        )
+    }
 
     Errors.setupCharts = function () {
-        const notFoundCanvas = document.getElementById('not-found');
-        const tooBusyCanvas = document.getElementById('toobusy');
-        let dailyLabels = utils.getDaysArray();
+        const notFoundCanvas = document.getElementById('not-found')
+        const tooBusyCanvas = document.getElementById('toobusy')
+        let dailyLabels = utils.getDaysArray()
 
-        dailyLabels = dailyLabels.slice(-7);
+        dailyLabels = dailyLabels.slice(-7)
 
         if (utils.isMobile()) {
-            Chart.defaults.global.tooltips.enabled = false;
+            Chart.defaults.global.tooltips.enabled = false
         }
 
         const data = {
@@ -67,10 +75,10 @@ define('admin/advanced/errors', ['bootbox', 'alerts', 'Chart'], function (bootbo
                     },
                 ],
             },
-        };
+        }
 
-        notFoundCanvas.width = $(notFoundCanvas).parent().width();
-        tooBusyCanvas.width = $(tooBusyCanvas).parent().width();
+        notFoundCanvas.width = $(notFoundCanvas).parent().width()
+        tooBusyCanvas.width = $(tooBusyCanvas).parent().width()
 
         new Chart(notFoundCanvas.getContext('2d'), {
             type: 'line',
@@ -81,14 +89,16 @@ define('admin/advanced/errors', ['bootbox', 'alerts', 'Chart'], function (bootbo
                     display: false,
                 },
                 scales: {
-                    yAxes: [{
-                        ticks: {
-                            beginAtZero: true,
+                    yAxes: [
+                        {
+                            ticks: {
+                                beginAtZero: true,
+                            },
                         },
-                    }],
+                    ],
                 },
             },
-        });
+        })
 
         new Chart(tooBusyCanvas.getContext('2d'), {
             type: 'line',
@@ -99,15 +109,17 @@ define('admin/advanced/errors', ['bootbox', 'alerts', 'Chart'], function (bootbo
                     display: false,
                 },
                 scales: {
-                    yAxes: [{
-                        ticks: {
-                            beginAtZero: true,
+                    yAxes: [
+                        {
+                            ticks: {
+                                beginAtZero: true,
+                            },
                         },
-                    }],
+                    ],
                 },
             },
-        });
-    };
+        })
+    }
 
-    return Errors;
-});
+    return Errors
+})

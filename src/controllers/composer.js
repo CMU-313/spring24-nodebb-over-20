@@ -24,12 +24,12 @@ const helpers_1 = __importDefault(require("./helpers"));
 function get(req, res, callback) {
     return __awaiter(this, void 0, void 0, function* () {
         res.locals.metaTags = Object.assign(Object.assign({}, res.locals.metaTags), { name: 'robots', content: 'noindex' });
-        const data = yield plugins_1.default.hooks.fire('filter:composer.build', {
+        const data = (yield plugins_1.default.hooks.fire('filter:composer.build', {
             req: req,
             res: res,
             next: callback,
             templateData: {},
-        });
+        }));
         if (res.headersSent) {
             return;
         }
@@ -60,18 +60,18 @@ function post(req, res) {
         };
         req.body.noscript = 'true';
         if (!data.content) {
-            return yield helpers_1.default.noScriptErrors(req, res, '[[error:invalid-data]]', 400);
+            return (yield helpers_1.default.noScriptErrors(req, res, '[[error:invalid-data]]', 400));
         }
         function queueOrPost(postFn, data) {
             return __awaiter(this, void 0, void 0, function* () {
                 // The next line calls a function in a module that has not been updated to TS yet
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-                const shouldQueue = yield posts_1.default.shouldQueue(req.uid, data);
+                const shouldQueue = (yield posts_1.default.shouldQueue(req.uid, data));
                 if (shouldQueue) {
                     delete data.req;
                     // The next line calls a function in a module that has not been updated to TS yet
                     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-                    return yield posts_1.default.addToQueue(data);
+                    return (yield posts_1.default.addToQueue(data));
                 }
                 return yield postFn(data);
             });
@@ -99,7 +99,9 @@ function post(req, res) {
             // The next line calls a function in a module that has not been updated to TS yet
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
             user_1.default.updateOnlineUsers(uid);
-            const path = result.pid ? `/post/${result.pid}` : `/topic/${result.topicData.slug}`;
+            const path = result.pid
+                ? `/post/${result.pid}`
+                : `/topic/${result.topicData.slug}`;
             res.redirect(nconf_1.default.get('relative_path') + path);
         }
         catch (err) {
