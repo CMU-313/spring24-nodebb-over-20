@@ -42,18 +42,16 @@ function find_compiled_js() {
     }
     
     module.exports = {
-        extends: ["nodebb"],
+        extends: ["nodebb", "prettier"],
         root: true,
         ignorePatterns: find_compiled_js(),
-        rules: {
-            "indent": ["error", 4]
-        },
+        rules: { },
         overrides: [
             {
                 files: ["**/*.ts", "**/*.tsx"],
                 extends: [
                     "plugin:@typescript-eslint/recommended",
-                    "plugin:@typescript-eslint/recommended-requiring-type-checking"
+                    "plugin:@typescript-eslint/recommended-requiring-type-checking", "prettier"
                 ],
                 parser: "@typescript-eslint/parser",
                 plugins: ["@typescript-eslint"],
