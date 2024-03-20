@@ -1,23 +1,22 @@
-'use strict';
-
+'use strict'
 
 define('admin/manage/category-analytics', ['Chart'], function (Chart) {
-    const CategoryAnalytics = {};
+    const CategoryAnalytics = {}
 
     CategoryAnalytics.init = function () {
-        const hourlyCanvas = document.getElementById('pageviews:hourly');
-        const dailyCanvas = document.getElementById('pageviews:daily');
-        const topicsCanvas = document.getElementById('topics:daily');
-        const postsCanvas = document.getElementById('posts:daily');
+        const hourlyCanvas = document.getElementById('pageviews:hourly')
+        const dailyCanvas = document.getElementById('pageviews:daily')
+        const topicsCanvas = document.getElementById('topics:daily')
+        const postsCanvas = document.getElementById('posts:daily')
         const hourlyLabels = utils.getHoursArray().map(function (text, idx) {
-            return idx % 3 ? '' : text;
-        });
+            return idx % 3 ? '' : text
+        })
         const dailyLabels = utils.getDaysArray().map(function (text, idx) {
-            return idx % 3 ? '' : text;
-        });
+            return idx % 3 ? '' : text
+        })
 
         if (utils.isMobile()) {
-            Chart.defaults.global.tooltips.enabled = false;
+            Chart.defaults.global.tooltips.enabled = false
         }
 
         const data = {
@@ -81,12 +80,12 @@ define('admin/manage/category-analytics', ['Chart'], function (Chart) {
                     },
                 ],
             },
-        };
+        }
 
-        hourlyCanvas.width = $(hourlyCanvas).parent().width();
-        dailyCanvas.width = $(dailyCanvas).parent().width();
-        topicsCanvas.width = $(topicsCanvas).parent().width();
-        postsCanvas.width = $(postsCanvas).parent().width();
+        hourlyCanvas.width = $(hourlyCanvas).parent().width()
+        dailyCanvas.width = $(dailyCanvas).parent().width()
+        topicsCanvas.width = $(topicsCanvas).parent().width()
+        postsCanvas.width = $(postsCanvas).parent().width()
 
         new Chart(hourlyCanvas.getContext('2d'), {
             type: 'line',
@@ -98,15 +97,17 @@ define('admin/manage/category-analytics', ['Chart'], function (Chart) {
                     display: false,
                 },
                 scales: {
-                    yAxes: [{
-                        ticks: {
-                            beginAtZero: true,
-                            precision: 0,
+                    yAxes: [
+                        {
+                            ticks: {
+                                beginAtZero: true,
+                                precision: 0,
+                            },
                         },
-                    }],
+                    ],
                 },
             },
-        });
+        })
 
         new Chart(dailyCanvas.getContext('2d'), {
             type: 'line',
@@ -118,15 +119,17 @@ define('admin/manage/category-analytics', ['Chart'], function (Chart) {
                     display: false,
                 },
                 scales: {
-                    yAxes: [{
-                        ticks: {
-                            beginAtZero: true,
-                            precision: 0,
+                    yAxes: [
+                        {
+                            ticks: {
+                                beginAtZero: true,
+                                precision: 0,
+                            },
                         },
-                    }],
+                    ],
                 },
             },
-        });
+        })
 
         new Chart(topicsCanvas.getContext('2d'), {
             type: 'line',
@@ -138,15 +141,17 @@ define('admin/manage/category-analytics', ['Chart'], function (Chart) {
                     display: false,
                 },
                 scales: {
-                    yAxes: [{
-                        ticks: {
-                            beginAtZero: true,
-                            precision: 0,
+                    yAxes: [
+                        {
+                            ticks: {
+                                beginAtZero: true,
+                                precision: 0,
+                            },
                         },
-                    }],
+                    ],
                 },
             },
-        });
+        })
 
         new Chart(postsCanvas.getContext('2d'), {
             type: 'line',
@@ -158,16 +163,18 @@ define('admin/manage/category-analytics', ['Chart'], function (Chart) {
                     display: false,
                 },
                 scales: {
-                    yAxes: [{
-                        ticks: {
-                            beginAtZero: true,
-                            precision: 0,
+                    yAxes: [
+                        {
+                            ticks: {
+                                beginAtZero: true,
+                                precision: 0,
+                            },
                         },
-                    }],
+                    ],
                 },
             },
-        });
-    };
+        })
+    }
 
-    return CategoryAnalytics;
-});
+    return CategoryAnalytics
+})
