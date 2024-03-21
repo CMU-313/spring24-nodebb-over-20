@@ -1,14 +1,14 @@
-'use strict';
+'use strict'
 
-const winston = require('winston');
-const async = require('async');
-const nconf = require('nconf');
-const session = require('express-session');
-const semver = require('semver');
+const winston = require('winston')
+const async = require('async')
+const nconf = require('nconf')
+const session = require('express-session')
+const semver = require('semver')
 
-const connection = require('./postgres/connection');
+const connection = require('./postgres/connection')
 
-const postgresModule = module.exports;
+const postgresModule = module.exports
 
 postgresModule.questions = [
     {
@@ -31,7 +31,10 @@ postgresModule.questions = [
         description: 'Password of your PostgreSQL database',
         hidden: true,
         default: nconf.get('postgres:password') || '',
-        before: function (value) { value = value || nconf.get('postgres:password') || ''; return value; },
+        before: function (value) {
+            value = value || nconf.get('postgres:password') || ''
+            return value
+        },
     },
     {
         name: 'postgres:database',
@@ -43,25 +46,26 @@ postgresModule.questions = [
         description: 'Enable SSL for PostgreSQL database access',
         default: nconf.get('postgres:ssl') || false,
     },
-];
+]
 
 postgresModule.init = async function () {
-    const { Pool } = require('pg');
-    const connOptions = connection.getConnectionOptions();
-    const pool = new Pool(connOptions);
-    postgresModule.pool = pool;
-    postgresModule.client = pool;
-    const client = await pool.connect();
+    const { Pool } = require('pg')
+    const connOptions = connection.getConnectionOptions()
+    const pool = new Pool(connOptions)
+    postgresModule.pool = pool
+    postgresModule.client = pool
+    const client = await pool.connect()
     try {
-        await checkUpgrade(client);
+        await checkUpgrade(client)
     } catch (err) {
-        winston.error(`NodeBB could not connect to your PostgreSQL database. PostgreSQL returned the following error: ${err.message}`);
-        throw err;
+        winston.error(
+            `NodeBB could not connect to your PostgreSQL database. PostgreSQL returned the following error: ${err.message}`
+        )
+        throw err
     } finally {
-        client.release();
+        client.release()
     }
-};
-
+}
 
 async function checkUpgrade(client) {
     const res = await client.query(`
@@ -78,19 +82,19 @@ SELECT EXISTS(SELECT *
        EXISTS(SELECT *
                 FROM "information_schema"."routines"
                WHERE "routine_schema" = 'public'
-                 AND "routine_name" = 'nodebb_get_sorted_set_members') c`);
+                 AND "routine_name" = 'nodebb_get_sorted_set_members') c`)
 
     if (res.rows[0].a && res.rows[0].b && res.rows[0].c) {
-        return;
+        return
     }
 
-    await client.query(`BEGIN`);
+    await client.query(`BEGIN`)
     try {
         if (!res.rows[0].b) {
             await client.query(`
 CREATE TYPE LEGACY_OBJECT_TYPE AS ENUM (
     'hash', 'zset', 'set', 'list', 'string'
-)`);
+)`)
             await client.query(`
 CREATE TABLE "legacy_object" (
     "_key" TEXT NOT NULL
@@ -98,7 +102,7 @@ CREATE TABLE "legacy_object" (
     "type" LEGACY_OBJECT_TYPE NOT NULL,
     "expireAt" TIMESTAMPTZ DEFAULT NULL,
     UNIQUE ( "_key", "type" )
-)`);
+)`)
             await client.query(`
 CREATE TABLE "legacy_hash" (
     "_key" TEXT NOT NULL
@@ -112,7 +116,7 @@ CREATE TABLE "legacy_hash" (
         REFERENCES "legacy_object"("_key", "type")
         ON UPDATE CASCADE
         ON DELETE CASCADE
-)`);
+)`)
             await client.query(`
 CREATE TABLE "legacy_zset" (
     "_key" TEXT NOT NULL,
@@ -127,7 +131,7 @@ CREATE TABLE "legacy_zset" (
         REFERENCES "legacy_object"("_key", "type")
         ON UPDATE CASCADE
         ON DELETE CASCADE
-)`);
+)`)
             await client.query(`
 CREATE TABLE "legacy_set" (
     "_key" TEXT NOT NULL,
@@ -141,7 +145,7 @@ CREATE TABLE "legacy_set" (
         REFERENCES "legacy_object"("_key", "type")
         ON UPDATE CASCADE
         ON DELETE CASCADE
-)`);
+)`)
             await client.query(`
 CREATE TABLE "legacy_list" (
     "_key" TEXT NOT NULL
@@ -155,7 +159,7 @@ CREATE TABLE "legacy_list" (
         REFERENCES "legacy_object"("_key", "type")
         ON UPDATE CASCADE
         ON DELETE CASCADE
-)`);
+)`)
             await client.query(`
 CREATE TABLE "legacy_string" (
     "_key" TEXT NOT NULL
@@ -169,7 +173,7 @@ CREATE TABLE "legacy_string" (
         REFERENCES "legacy_object"("_key", "type")
         ON UPDATE CASCADE
         ON DELETE CASCADE
-)`);
+)`)
 
             if (res.rows[0].a) {
                 await client.query(`
@@ -199,7 +203,7 @@ SELECT DISTINCT "data"->>'_key',
                      THEN to_timestamp(("data"->>'expireAt')::double precision / 1000)
                      ELSE NULL
                 END
-  FROM "objects"`);
+  FROM "objects"`)
                 await client.query(`
 INSERT INTO "legacy_hash" ("_key", "data")
 SELECT "data"->>'_key',
@@ -216,7 +220,7 @@ SELECT "data"->>'_key',
             THEN NOT (("data" ? 'value')
                   AND ("data" ? 'score'))
             ELSE TRUE
-       END`);
+       END`)
                 await client.query(`
 INSERT INTO "legacy_zset" ("_key", "value", "score")
 SELECT "data"->>'_key',
@@ -226,7 +230,7 @@ SELECT "data"->>'_key',
  WHERE (SELECT COUNT(*)
           FROM jsonb_object_keys("data" - 'expireAt')) = 3
    AND ("data" ? 'value')
-   AND ("data" ? 'score')`);
+   AND ("data" ? 'score')`)
                 await client.query(`
 INSERT INTO "legacy_set" ("_key", "member")
 SELECT "data"->>'_key',
@@ -234,7 +238,7 @@ SELECT "data"->>'_key',
   FROM "objects"
  WHERE (SELECT COUNT(*)
           FROM jsonb_object_keys("data" - 'expireAt')) = 2
-   AND ("data" ? 'members')`);
+   AND ("data" ? 'members')`)
                 await client.query(`
 INSERT INTO "legacy_list" ("_key", "array")
 SELECT "data"->>'_key',
@@ -244,7 +248,7 @@ SELECT "data"->>'_key',
   FROM "objects"
  WHERE (SELECT COUNT(*)
           FROM jsonb_object_keys("data" - 'expireAt')) = 2
-   AND ("data" ? 'array')`);
+   AND ("data" ? 'array')`)
                 await client.query(`
 INSERT INTO "legacy_string" ("_key", "data")
 SELECT "data"->>'_key',
@@ -256,16 +260,18 @@ SELECT "data"->>'_key',
  WHERE (SELECT COUNT(*)
           FROM jsonb_object_keys("data" - 'expireAt')) = 2
    AND (("data" ? 'value')
-     OR ("data" ? 'data'))`);
-                await client.query(`DROP TABLE "objects" CASCADE`);
-                await client.query(`DROP FUNCTION "fun__objects__expireAt"() CASCADE`);
+     OR ("data" ? 'data'))`)
+                await client.query(`DROP TABLE "objects" CASCADE`)
+                await client.query(
+                    `DROP FUNCTION "fun__objects__expireAt"() CASCADE`
+                )
             }
             await client.query(`
 CREATE VIEW "legacy_object_live" AS
 SELECT "_key", "type"
   FROM "legacy_object"
  WHERE "expireAt" IS NULL
-    OR "expireAt" > CURRENT_TIMESTAMP`);
+    OR "expireAt" > CURRENT_TIMESTAMP`)
         }
 
         if (!res.rows[0].c) {
@@ -280,31 +286,31 @@ CREATE FUNCTION "nodebb_get_sorted_set_members"(TEXT) RETURNS TEXT[] AS $$
 $$ LANGUAGE sql
 STABLE
 STRICT
-PARALLEL SAFE`);
+PARALLEL SAFE`)
         }
     } catch (ex) {
-        await client.query(`ROLLBACK`);
-        throw ex;
+        await client.query(`ROLLBACK`)
+        throw ex
     }
-    await client.query(`COMMIT`);
+    await client.query(`COMMIT`)
 }
 
 postgresModule.createSessionStore = async function (options) {
-    const meta = require('../meta');
+    const meta = require('../meta')
 
     function done(db) {
-        const sessionStore = require('connect-pg-simple')(session);
+        const sessionStore = require('connect-pg-simple')(session)
         return new sessionStore({
             pool: db,
             ttl: meta.getSessionTTLSeconds(),
             pruneSessionInterval: nconf.get('isPrimary') ? 60 : false,
-        });
+        })
     }
 
-    const db = await connection.connect(options);
+    const db = await connection.connect(options)
 
     if (!nconf.get('isPrimary')) {
-        return done(db);
+        return done(db)
     }
 
     await db.query(`
@@ -320,71 +326,89 @@ CREATE INDEX IF NOT EXISTS "session_expire_idx" ON "session"("expire");
 
 ALTER TABLE "session"
     ALTER "sid" SET STORAGE MAIN,
-    CLUSTER ON "session_expire_idx";`);
+    CLUSTER ON "session_expire_idx";`)
 
-    return done(db);
-};
+    return done(db)
+}
 
 postgresModule.createIndices = function (callback) {
     if (!postgresModule.pool) {
-        winston.warn('[database/createIndices] database not initialized');
-        return callback();
+        winston.warn('[database/createIndices] database not initialized')
+        return callback()
     }
 
-    const query = postgresModule.pool.query.bind(postgresModule.pool);
+    const query = postgresModule.pool.query.bind(postgresModule.pool)
 
-    winston.info('[database] Checking database indices.');
-    async.series([
-        async.apply(query, `CREATE INDEX IF NOT EXISTS "idx__legacy_zset__key__score" ON "legacy_zset"("_key" ASC, "score" DESC)`),
-        async.apply(query, `CREATE INDEX IF NOT EXISTS "idx__legacy_object__expireAt" ON "legacy_object"("expireAt" ASC)`),
-    ], (err) => {
-        if (err) {
-            winston.error(`Error creating index ${err.message}`);
-            return callback(err);
+    winston.info('[database] Checking database indices.')
+    async.series(
+        [
+            async.apply(
+                query,
+                `CREATE INDEX IF NOT EXISTS "idx__legacy_zset__key__score" ON "legacy_zset"("_key" ASC, "score" DESC)`
+            ),
+            async.apply(
+                query,
+                `CREATE INDEX IF NOT EXISTS "idx__legacy_object__expireAt" ON "legacy_object"("expireAt" ASC)`
+            ),
+        ],
+        (err) => {
+            if (err) {
+                winston.error(`Error creating index ${err.message}`)
+                return callback(err)
+            }
+            winston.info('[database] Checking database indices done!')
+            callback()
         }
-        winston.info('[database] Checking database indices done!');
-        callback();
-    });
-};
+    )
+}
 
 postgresModule.checkCompatibility = function (callback) {
-    const postgresPkg = require('pg/package.json');
-    postgresModule.checkCompatibilityVersion(postgresPkg.version, callback);
-};
+    const postgresPkg = require('pg/package.json')
+    postgresModule.checkCompatibilityVersion(postgresPkg.version, callback)
+}
 
 postgresModule.checkCompatibilityVersion = function (version, callback) {
     if (semver.lt(version, '7.0.0')) {
-        return callback(new Error('The `pg` package is out-of-date, please run `./nodebb setup` again.'));
+        return callback(
+            new Error(
+                'The `pg` package is out-of-date, please run `./nodebb setup` again.'
+            )
+        )
     }
 
-    callback();
-};
+    callback()
+}
 
 postgresModule.info = async function (db) {
     if (!db) {
-        db = await connection.connect(nconf.get('postgres'));
+        db = await connection.connect(nconf.get('postgres'))
     }
-    postgresModule.pool = postgresModule.pool || db;
+    postgresModule.pool = postgresModule.pool || db
     const res = await db.query(`
         SELECT true "postgres",
            current_setting('server_version') "version",
              EXTRACT(EPOCH FROM NOW() - pg_postmaster_start_time()) * 1000 "uptime"
-    `);
+    `)
     return {
         ...res.rows[0],
         raw: JSON.stringify(res.rows[0], null, 4),
-    };
-};
+    }
+}
 
 postgresModule.close = async function () {
-    await postgresModule.pool.end();
-};
+    await postgresModule.pool.end()
+}
 
-require('./postgres/main')(postgresModule);
-require('./postgres/hash')(postgresModule);
-require('./postgres/sets')(postgresModule);
-require('./postgres/sorted')(postgresModule);
-require('./postgres/list')(postgresModule);
-require('./postgres/transaction')(postgresModule);
+require('./postgres/main')(postgresModule)
+require('./postgres/hash')(postgresModule)
+require('./postgres/sets')(postgresModule)
+require('./postgres/sorted')(postgresModule)
+require('./postgres/list')(postgresModule)
+require('./postgres/transaction')(postgresModule)
 
-require('../promisify')(postgresModule, ['client', 'sessionStore', 'pool', 'transaction']);
+require('../promisify')(postgresModule, [
+    'client',
+    'sessionStore',
+    'pool',
+    'transaction',
+])

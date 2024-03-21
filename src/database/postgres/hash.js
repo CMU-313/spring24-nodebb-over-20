@@ -1,24 +1,24 @@
-'use strict';
+'use strict'
 
 module.exports = function (module) {
-    const helpers = require('./helpers');
+    const helpers = require('./helpers')
 
     module.setObject = async function (key, data) {
         if (!key || !data) {
-            return;
+            return
         }
 
         if (data.hasOwnProperty('')) {
-            delete data[''];
+            delete data['']
         }
         if (!Object.keys(data).length) {
-            return;
+            return
         }
         await module.transaction(async (client) => {
-            const dataString = JSON.stringify(data);
+            const dataString = JSON.stringify(data)
 
             if (Array.isArray(key)) {
-                await helpers.ensureLegacyObjectsType(client, key, 'hash');
+                await helpers.ensureLegacyObjectsType(client, key, 'hash')
                 await client.query({
                     name: 'setObjectKeys',
                     text: `
@@ -28,9 +28,9 @@ module.exports = function (module) {
     ON CONFLICT ("_key")
     DO UPDATE SET "data" = "legacy_hash"."data" || $2::TEXT::JSONB`,
                     values: [key, dataString],
-                });
+                })
             } else {
-                await helpers.ensureLegacyObjectType(client, key, 'hash');
+                await helpers.ensureLegacyObjectType(client, key, 'hash')
                 await client.query({
                     name: 'setObject',
                     text: `
@@ -39,35 +39,37 @@ module.exports = function (module) {
     ON CONFLICT ("_key")
     DO UPDATE SET "data" = "legacy_hash"."data" || $2::TEXT::JSONB`,
                     values: [key, dataString],
-                });
+                })
             }
-        });
-    };
+        })
+    }
 
     module.setObjectBulk = async function (...args) {
-        let data = args[0];
+        let data = args[0]
         if (!Array.isArray(data) || !data.length) {
-            return;
+            return
         }
         if (Array.isArray(args[1])) {
-            console.warn('[deprecated] db.setObjectBulk(keys, data) usage is deprecated, please use db.setObjectBulk(data)');
+            console.warn(
+                '[deprecated] db.setObjectBulk(keys, data) usage is deprecated, please use db.setObjectBulk(data)'
+            )
             // conver old format to new format for backwards compatibility
-            data = args[0].map((key, i) => [key, args[1][i]]);
+            data = args[0].map((key, i) => [key, args[1][i]])
         }
         await module.transaction(async (client) => {
             data = data.filter((item) => {
                 if (item[1].hasOwnProperty('')) {
-                    delete item[1][''];
+                    delete item[1]['']
                 }
-                return !!Object.keys(item[1]).length;
-            });
-            const keys = data.map(item => item[0]);
+                return !!Object.keys(item[1]).length
+            })
+            const keys = data.map((item) => item[0])
             if (!keys.length) {
-                return;
+                return
             }
 
-            await helpers.ensureLegacyObjectsType(client, keys, 'hash');
-            const dataStrings = data.map(item => JSON.stringify(item[1]));
+            await helpers.ensureLegacyObjectsType(client, keys, 'hash')
+            const dataStrings = data.map((item) => JSON.stringify(item[1]))
             await client.query({
                 name: 'setObjectBulk',
                 text: `
@@ -77,21 +79,21 @@ module.exports = function (module) {
             ON CONFLICT ("_key")
             DO UPDATE SET "data" = "legacy_hash"."data" || EXCLUDED.data`,
                 values: [keys, dataStrings],
-            });
-        });
-    };
+            })
+        })
+    }
 
     module.setObjectField = async function (key, field, value) {
         if (!field) {
-            return;
+            return
         }
 
         await module.transaction(async (client) => {
-            const valueString = JSON.stringify(value);
+            const valueString = JSON.stringify(value)
             if (Array.isArray(key)) {
-                await module.setObject(key, { [field]: value });
+                await module.setObject(key, { [field]: value })
             } else {
-                await helpers.ensureLegacyObjectType(client, key, 'hash');
+                await helpers.ensureLegacyObjectType(client, key, 'hash')
                 await client.query({
                     name: 'setObjectField',
                     text: `
@@ -100,17 +102,17 @@ module.exports = function (module) {
     ON CONFLICT ("_key")
     DO UPDATE SET "data" = jsonb_set("legacy_hash"."data", ARRAY[$2::TEXT], $3::TEXT::JSONB)`,
                     values: [key, field, valueString],
-                });
+                })
             }
-        });
-    };
+        })
+    }
 
     module.getObject = async function (key, fields = []) {
         if (!key) {
-            return null;
+            return null
         }
         if (fields.length) {
-            return await module.getObjectFields(key, fields);
+            return await module.getObjectFields(key, fields)
         }
         const res = await module.pool.query({
             name: 'getObject',
@@ -123,17 +125,17 @@ SELECT h."data"
  WHERE o."_key" = $1::TEXT
  LIMIT 1`,
             values: [key],
-        });
+        })
 
-        return res.rows.length ? res.rows[0].data : null;
-    };
+        return res.rows.length ? res.rows[0].data : null
+    }
 
     module.getObjects = async function (keys, fields = []) {
         if (!Array.isArray(keys) || !keys.length) {
-            return [];
+            return []
         }
         if (fields.length) {
-            return await module.getObjectsFields(keys, fields);
+            return await module.getObjectsFields(keys, fields)
         }
         const res = await module.pool.query({
             name: 'getObjects',
@@ -147,14 +149,14 @@ SELECT h."data"
               AND o."type" = h."type"
  ORDER BY k.i ASC`,
             values: [keys],
-        });
+        })
 
-        return res.rows.map(row => row.data);
-    };
+        return res.rows.map((row) => row.data)
+    }
 
     module.getObjectField = async function (key, field) {
         if (!key) {
-            return null;
+            return null
         }
 
         const res = await module.pool.query({
@@ -168,17 +170,17 @@ SELECT h."data"->>$2::TEXT f
  WHERE o."_key" = $1::TEXT
  LIMIT 1`,
             values: [key, field],
-        });
+        })
 
-        return res.rows.length ? res.rows[0].f : null;
-    };
+        return res.rows.length ? res.rows[0].f : null
+    }
 
     module.getObjectFields = async function (key, fields) {
         if (!key) {
-            return null;
+            return null
         }
         if (!Array.isArray(fields) || !fields.length) {
-            return await module.getObject(key);
+            return await module.getObject(key)
         }
         const res = await module.pool.query({
             name: 'getObjectFields',
@@ -193,27 +195,27 @@ SELECT (SELECT jsonb_object_agg(f, d."value")
         AND o."type" = h."type"
  WHERE o."_key" = $1::TEXT`,
             values: [key, fields],
-        });
+        })
 
         if (res.rows.length) {
-            return res.rows[0].d;
+            return res.rows[0].d
         }
 
-        const obj = {};
+        const obj = {}
         fields.forEach((f) => {
-            obj[f] = null;
-        });
+            obj[f] = null
+        })
 
-        return obj;
-    };
+        return obj
+    }
 
     module.getObjectsFields = async function (keys, fields) {
         if (!Array.isArray(keys) || !keys.length) {
-            return [];
+            return []
         }
 
         if (!Array.isArray(fields) || !fields.length) {
-            return await module.getObjects(keys);
+            return await module.getObjects(keys)
         }
         const res = await module.pool.query({
             name: 'getObjectsFields',
@@ -230,14 +232,14 @@ SELECT (SELECT jsonb_object_agg(f, d."value")
               AND o."type" = h."type"
  ORDER BY k.i ASC`,
             values: [keys, fields],
-        });
+        })
 
-        return res.rows.map(row => row.d);
-    };
+        return res.rows.map((row) => row.d)
+    }
 
     module.getObjectKeys = async function (key) {
         if (!key) {
-            return;
+            return
         }
 
         const res = await module.pool.query({
@@ -251,19 +253,19 @@ SELECT ARRAY(SELECT jsonb_object_keys(h."data")) k
  WHERE o."_key" = $1::TEXT
  LIMIT 1`,
             values: [key],
-        });
+        })
 
-        return res.rows.length ? res.rows[0].k : [];
-    };
+        return res.rows.length ? res.rows[0].k : []
+    }
 
     module.getObjectValues = async function (key) {
-        const data = await module.getObject(key);
-        return data ? Object.values(data) : [];
-    };
+        const data = await module.getObject(key)
+        return data ? Object.values(data) : []
+    }
 
     module.isObjectField = async function (key, field) {
         if (!key) {
-            return;
+            return
         }
 
         const res = await module.pool.query({
@@ -277,30 +279,37 @@ SELECT (h."data" ? $2::TEXT AND h."data"->>$2::TEXT IS NOT NULL) b
  WHERE o."_key" = $1::TEXT
  LIMIT 1`,
             values: [key, field],
-        });
+        })
 
-        return res.rows.length ? res.rows[0].b : false;
-    };
+        return res.rows.length ? res.rows[0].b : false
+    }
 
     module.isObjectFields = async function (key, fields) {
         if (!key) {
-            return;
+            return
         }
 
-        const data = await module.getObjectFields(key, fields);
+        const data = await module.getObjectFields(key, fields)
         if (!data) {
-            return fields.map(() => false);
+            return fields.map(() => false)
         }
-        return fields.map(field => data.hasOwnProperty(field) && data[field] !== null);
-    };
+        return fields.map(
+            (field) => data.hasOwnProperty(field) && data[field] !== null
+        )
+    }
 
     module.deleteObjectField = async function (key, field) {
-        await module.deleteObjectFields(key, [field]);
-    };
+        await module.deleteObjectFields(key, [field])
+    }
 
     module.deleteObjectFields = async function (key, fields) {
-        if (!key || (Array.isArray(key) && !key.length) || !Array.isArray(fields) || !fields.length) {
-            return;
+        if (
+            !key ||
+            (Array.isArray(key) && !key.length) ||
+            !Array.isArray(fields) ||
+            !fields.length
+        ) {
+            return
         }
 
         if (Array.isArray(key)) {
@@ -313,7 +322,7 @@ SELECT (h."data" ? $2::TEXT AND h."data"->>$2::TEXT IS NOT NULL) b
                                WHERE "key" <> ALL ($2::TEXT[])), '{}')
      WHERE "_key" = ANY($1::TEXT[])`,
                 values: [key, fields],
-            });
+            })
         } else {
             await module.pool.query({
                 name: 'deleteObjectFields',
@@ -324,65 +333,73 @@ SELECT (h."data" ? $2::TEXT AND h."data"->>$2::TEXT IS NOT NULL) b
                                WHERE "key" <> ALL ($2::TEXT[])), '{}')
      WHERE "_key" = $1::TEXT`,
                 values: [key, fields],
-            });
+            })
         }
-    };
+    }
 
     module.incrObjectField = async function (key, field) {
-        return await module.incrObjectFieldBy(key, field, 1);
-    };
+        return await module.incrObjectFieldBy(key, field, 1)
+    }
 
     module.decrObjectField = async function (key, field) {
-        return await module.incrObjectFieldBy(key, field, -1);
-    };
+        return await module.incrObjectFieldBy(key, field, -1)
+    }
 
     module.incrObjectFieldBy = async function (key, field, value) {
-        value = parseInt(value, 10);
+        value = parseInt(value, 10)
 
         if (!key || isNaN(value)) {
-            return null;
+            return null
         }
 
         return await module.transaction(async (client) => {
             if (Array.isArray(key)) {
-                await helpers.ensureLegacyObjectsType(client, key, 'hash');
+                await helpers.ensureLegacyObjectsType(client, key, 'hash')
             } else {
-                await helpers.ensureLegacyObjectType(client, key, 'hash');
+                await helpers.ensureLegacyObjectType(client, key, 'hash')
             }
 
-            const res = await client.query(Array.isArray(key) ? {
-                name: 'incrObjectFieldByMulti',
-                text: `
+            const res = await client.query(
+                Array.isArray(key)
+                    ? {
+                          name: 'incrObjectFieldByMulti',
+                          text: `
 INSERT INTO "legacy_hash" ("_key", "data")
 SELECT UNNEST($1::TEXT[]), jsonb_build_object($2::TEXT, $3::NUMERIC)
 ON CONFLICT ("_key")
 DO UPDATE SET "data" = jsonb_set("legacy_hash"."data", ARRAY[$2::TEXT], to_jsonb(COALESCE(("legacy_hash"."data"->>$2::TEXT)::NUMERIC, 0) + $3::NUMERIC))
 RETURNING ("data"->>$2::TEXT)::NUMERIC v`,
-                values: [key, field, value],
-            } : {
-                name: 'incrObjectFieldBy',
-                text: `
+                          values: [key, field, value],
+                      }
+                    : {
+                          name: 'incrObjectFieldBy',
+                          text: `
 INSERT INTO "legacy_hash" ("_key", "data")
 VALUES ($1::TEXT, jsonb_build_object($2::TEXT, $3::NUMERIC))
 ON CONFLICT ("_key")
 DO UPDATE SET "data" = jsonb_set("legacy_hash"."data", ARRAY[$2::TEXT], to_jsonb(COALESCE(("legacy_hash"."data"->>$2::TEXT)::NUMERIC, 0) + $3::NUMERIC))
 RETURNING ("data"->>$2::TEXT)::NUMERIC v`,
-                values: [key, field, value],
-            });
-            return Array.isArray(key) ? res.rows.map(r => parseFloat(r.v)) : parseFloat(res.rows[0].v);
-        });
-    };
+                          values: [key, field, value],
+                      }
+            )
+            return Array.isArray(key)
+                ? res.rows.map((r) => parseFloat(r.v))
+                : parseFloat(res.rows[0].v)
+        })
+    }
 
     module.incrObjectFieldByBulk = async function (data) {
         if (!Array.isArray(data) || !data.length) {
-            return;
+            return
         }
         // TODO: perf?
-        await Promise.all(data.map(async (item) => {
-            for (const [field, value] of Object.entries(item[1])) {
-                // eslint-disable-next-line no-await-in-loop
-                await module.incrObjectFieldBy(item[0], field, value);
-            }
-        }));
-    };
-};
+        await Promise.all(
+            data.map(async (item) => {
+                for (const [field, value] of Object.entries(item[1])) {
+                    // eslint-disable-next-line no-await-in-loop
+                    await module.incrObjectFieldBy(item[0], field, value)
+                }
+            })
+        )
+    }
+}

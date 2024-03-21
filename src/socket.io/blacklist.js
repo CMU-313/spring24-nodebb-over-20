@@ -1,36 +1,35 @@
+'use strict'
 
-'use strict';
+const user = require('../user')
+const meta = require('../meta')
+const events = require('../events')
 
-const user = require('../user');
-const meta = require('../meta');
-const events = require('../events');
-
-const SocketBlacklist = module.exports;
+const SocketBlacklist = module.exports
 
 SocketBlacklist.validate = async function (socket, data) {
-    return meta.blacklist.validate(data.rules);
-};
+    return meta.blacklist.validate(data.rules)
+}
 
 SocketBlacklist.save = async function (socket, rules) {
-    await blacklist(socket, 'save', rules);
-};
+    await blacklist(socket, 'save', rules)
+}
 
 SocketBlacklist.addRule = async function (socket, rule) {
-    await blacklist(socket, 'addRule', rule);
-};
+    await blacklist(socket, 'addRule', rule)
+}
 
 async function blacklist(socket, method, rule) {
-    const isAdminOrGlobalMod = await user.isAdminOrGlobalMod(socket.uid);
+    const isAdminOrGlobalMod = await user.isAdminOrGlobalMod(socket.uid)
     if (!isAdminOrGlobalMod) {
-        throw new Error('[[error:no-privileges]]');
+        throw new Error('[[error:no-privileges]]')
     }
-    await meta.blacklist[method](rule);
+    await meta.blacklist[method](rule)
     await events.log({
         type: `ip-blacklist-${method}`,
         uid: socket.uid,
         ip: socket.ip,
         rule: rule,
-    });
+    })
 }
 
-require('../promisify')(SocketBlacklist);
+require('../promisify')(SocketBlacklist)

@@ -1,8 +1,8 @@
 // webpack config for webinstaller
 
-'use strict';
+'use strict'
 
-const path = require('path');
+const path = require('path')
 
 module.exports = {
     mode: 'production',
@@ -16,10 +16,7 @@ module.exports = {
     },
     resolve: {
         symlinks: false,
-        modules: [
-            'public/src',
-            'node_modules',
-        ],
+        modules: ['public/src', 'node_modules'],
         fallback: { path: require.resolve('path-browserify') },
     },
-};
+}
