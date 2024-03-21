@@ -1,4 +1,4 @@
-'use strict';
+'use strict'
 
 const accountsController = {
     profile: require('./accounts/profile'),
@@ -15,6 +15,6 @@ const accountsController = {
     blocks: require('./accounts/blocks'),
     uploads: require('./accounts/uploads'),
     consent: require('./accounts/consent'),
-};
+}
 
-module.exports = accountsController;
+module.exports = accountsController

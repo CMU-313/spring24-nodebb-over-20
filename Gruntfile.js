@@ -1,71 +1,101 @@
-'use strict';
+'use strict'
 
-const path = require('path');
-const nconf = require('nconf');
+const path = require('path')
+const nconf = require('nconf')
 
 nconf.argv().env({
     separator: '__',
-});
-const winston = require('winston');
-const { fork } = require('child_process');
+})
+const winston = require('winston')
+const { fork } = require('child_process')
 
-const { env } = process;
-let worker;
+const { env } = process
+let worker
 
-env.NODE_ENV = env.NODE_ENV || 'development';
+env.NODE_ENV = env.NODE_ENV || 'development'
 
-const configFile = path.resolve(__dirname, nconf.any(['config', 'CONFIG']) || 'config.json');
-const prestart = require('./src/prestart');
+const configFile = path.resolve(
+    __dirname,
+    nconf.any(['config', 'CONFIG']) || 'config.json'
+)
+const prestart = require('./src/prestart')
 
-prestart.loadConfig(configFile);
+prestart.loadConfig(configFile)
 
-const db = require('./src/database');
-const plugins = require('./src/plugins');
+const db = require('./src/database')
+const plugins = require('./src/plugins')
 
 module.exports = function (grunt) {
-    const args = [];
+    const args = []
 
     if (!grunt.option('verbose')) {
-        args.push('--log-level=info');
-        nconf.set('log-level', 'info');
+        args.push('--log-level=info')
+        nconf.set('log-level', 'info')
     }
-    prestart.setupWinston();
+    prestart.setupWinston()
 
     grunt.initConfig({
         watch: {},
-    });
+    })
 
-    grunt.loadNpmTasks('grunt-contrib-watch');
+    grunt.loadNpmTasks('grunt-contrib-watch')
 
-    grunt.registerTask('default', ['watch']);
+    grunt.registerTask('default', ['watch'])
 
     grunt.registerTask('init', async function () {
-        const done = this.async();
-        let pluginList = [];
+        const done = this.async()
+        let pluginList = []
         if (!process.argv.includes('--core')) {
-            await db.init();
-            pluginList = await plugins.getActive();
+            await db.init()
+            pluginList = await plugins.getActive()
             if (!pluginList.includes('nodebb-plugin-composer-default')) {
-                pluginList.push('nodebb-plugin-composer-default');
+                pluginList.push('nodebb-plugin-composer-default')
             }
         }
 
-        const styleUpdated_Client = pluginList.map(p => `node_modules/${p}/*.less`)
-            .concat(pluginList.map(p => `node_modules/${p}/*.css`))
-            .concat(pluginList.map(p => `node_modules/${p}/+(public|static|less)/**/*.less`))
-            .concat(pluginList.map(p => `node_modules/${p}/+(public|static)/**/*.css`));
+        const styleUpdated_Client = pluginList
+            .map((p) => `node_modules/${p}/*.less`)
+            .concat(pluginList.map((p) => `node_modules/${p}/*.css`))
+            .concat(
+                pluginList.map(
+                    (p) => `node_modules/${p}/+(public|static|less)/**/*.less`
+                )
+            )
+            .concat(
+                pluginList.map(
+                    (p) => `node_modules/${p}/+(public|static)/**/*.css`
+                )
+            )
 
-        const styleUpdated_Admin = pluginList.map(p => `node_modules/${p}/*.less`)
-            .concat(pluginList.map(p => `node_modules/${p}/*.css`))
-            .concat(pluginList.map(p => `node_modules/${p}/+(public|static|less)/**/*.less`))
-            .concat(pluginList.map(p => `node_modules/${p}/+(public|static)/**/*.css`));
+        const styleUpdated_Admin = pluginList
+            .map((p) => `node_modules/${p}/*.less`)
+            .concat(pluginList.map((p) => `node_modules/${p}/*.css`))
+            .concat(
+                pluginList.map(
+                    (p) => `node_modules/${p}/+(public|static|less)/**/*.less`
+                )
+            )
+            .concat(
+                pluginList.map(
+                    (p) => `node_modules/${p}/+(public|static)/**/*.css`
+                )
+            )
 
-        const clientUpdated = pluginList.map(p => `node_modules/${p}/+(public|static)/**/*.js`);
-        const serverUpdated = pluginList.map(p => `node_modules/${p}/*.js`)
-            .concat(pluginList.map(p => `node_modules/${p}/+(lib|src)/**/*.js`));
+        const clientUpdated = pluginList.map(
+            (p) => `node_modules/${p}/+(public|static)/**/*.js`
+        )
+        const serverUpdated = pluginList
+            .map((p) => `node_modules/${p}/*.js`)
+            .concat(
+                pluginList.map((p) => `node_modules/${p}/+(lib|src)/**/*.js`)
+            )
 
-        const templatesUpdated = pluginList.map(p => `node_modules/${p}/+(public|static|templates)/**/*.tpl`);
-        const langUpdated = pluginList.map(p => `node_modules/${p}/+(public|static|languages)/**/*.json`);
+        const templatesUpdated = pluginList.map(
+            (p) => `node_modules/${p}/+(public|static|templates)/**/*.tpl`
+        )
+        const langUpdated = pluginList.map(
+            (p) => `node_modules/${p}/+(public|static|languages)/**/*.json`
+        )
 
         grunt.config(['watch'], {
             styleUpdated_Client: {
@@ -145,62 +175,69 @@ module.exports = function (grunt) {
                     interval: 1000,
                 },
             },
-        });
-        const build = require('./src/meta/build');
+        })
+        const build = require('./src/meta/build')
         if (!grunt.option('skip')) {
-            await build.build(true, { watch: true });
+            await build.build(true, { watch: true })
         }
-        run();
-        done();
-    });
+        run()
+        done()
+    })
 
     function run() {
         if (worker) {
-            worker.kill();
+            worker.kill()
         }
 
-        const execArgv = [];
-        const inspect = process.argv.find(a => a.startsWith('--inspect'));
+        const execArgv = []
+        const inspect = process.argv.find((a) => a.startsWith('--inspect'))
 
         if (inspect) {
-            execArgv.push(inspect);
+            execArgv.push(inspect)
         }
 
         worker = fork('app.js', args, {
             env,
             execArgv,
-        });
+        })
     }
 
-    grunt.task.run('init');
+    grunt.task.run('init')
 
-    grunt.event.removeAllListeners('watch');
+    grunt.event.removeAllListeners('watch')
     grunt.event.on('watch', (action, filepath, target) => {
-        let compiling;
+        let compiling
         if (target === 'styleUpdated_Client') {
-            compiling = 'clientCSS';
+            compiling = 'clientCSS'
         } else if (target === 'styleUpdated_Admin') {
-            compiling = 'acpCSS';
-        } else if (target === 'clientUpdated' || target === 'typescriptUpdated') {
-            compiling = 'js';
+            compiling = 'acpCSS'
+        } else if (
+            target === 'clientUpdated' ||
+            target === 'typescriptUpdated'
+        ) {
+            compiling = 'js'
         } else if (target === 'templatesUpdated') {
-            compiling = 'tpl';
+            compiling = 'tpl'
         } else if (target === 'langUpdated') {
-            compiling = 'lang';
+            compiling = 'lang'
         } else if (target === 'serverUpdated') {
             // empty require cache
-            const paths = ['./src/meta/build.js', './src/meta/index.js'];
-            paths.forEach(p => delete require.cache[require.resolve(p)]);
-            return run();
+            const paths = ['./src/meta/build.js', './src/meta/index.js']
+            paths.forEach((p) => delete require.cache[require.resolve(p)])
+            return run()
         }
 
-        require('./src/meta/build').build([compiling], { webpack: false }, (err) => {
-            if (err) {
-                winston.error(err.stack);
+        require('./src/meta/build').build(
+            [compiling],
+            { webpack: false },
+            (err) => {
+                if (err) {
+                    winston.error(err.stack)
+                }
+                if (worker) {
+                    worker.send({ compiling: compiling })
+                }
             }
-            if (worker) {
-                worker.send({ compiling: compiling });
-            }
-        });
-    });
-};
+        )
+    })
+}

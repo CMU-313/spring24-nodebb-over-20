@@ -1,4 +1,4 @@
-'use strict';
+'use strict'
 
 module.exports = {
     users: require('./users'),
@@ -8,4 +8,4 @@ module.exports = {
     chats: require('./chats'),
     categories: require('./categories'),
     flags: require('./flags'),
-};
+}

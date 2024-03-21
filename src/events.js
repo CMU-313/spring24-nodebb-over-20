@@ -1,16 +1,15 @@
+'use strict'
 
-'use strict';
+const validator = require('validator')
+const _ = require('lodash')
 
-const validator = require('validator');
-const _ = require('lodash');
+const db = require('./database')
+const batch = require('./batch')
+const user = require('./user')
+const utils = require('./utils')
+const plugins = require('./plugins')
 
-const db = require('./database');
-const batch = require('./batch');
-const user = require('./user');
-const utils = require('./utils');
-const plugins = require('./plugins');
-
-const events = module.exports;
+const events = module.exports
 
 events.types = [
     'plugin-activate',
@@ -76,99 +75,111 @@ events.types = [
     'account-locked',
     'getUsersCSV',
     // To add new types from plugins, just Array.push() to this array
-];
+]
 
 /**
  * Useful options in data: type, uid, ip, targetUid
  * Everything else gets stringified and shown as pretty JSON string
  */
 events.log = async function (data) {
-    const eid = await db.incrObjectField('global', 'nextEid');
-    data.timestamp = Date.now();
-    data.eid = eid;
+    const eid = await db.incrObjectField('global', 'nextEid')
+    data.timestamp = Date.now()
+    data.eid = eid
 
     await Promise.all([
-        db.sortedSetsAdd([
-            'events:time',
-            `events:time:${data.type}`,
-        ], data.timestamp, eid),
+        db.sortedSetsAdd(
+            ['events:time', `events:time:${data.type}`],
+            data.timestamp,
+            eid
+        ),
         db.setObject(`event:${eid}`, data),
-    ]);
-    plugins.hooks.fire('action:events.log', { data: data });
-};
+    ])
+    plugins.hooks.fire('action:events.log', { data: data })
+}
 
 events.getEvents = async function (filter, start, stop, from, to) {
     // from/to optional
     if (from === undefined) {
-        from = 0;
+        from = 0
     }
     if (to === undefined) {
-        to = Date.now();
+        to = Date.now()
     }
 
-    const eids = await db.getSortedSetRevRangeByScore(`events:time${filter ? `:${filter}` : ''}`, start, stop - start + 1, to, from);
-    let eventsData = await db.getObjects(eids.map(eid => `event:${eid}`));
-    eventsData = eventsData.filter(Boolean);
-    await addUserData(eventsData, 'uid', 'user');
-    await addUserData(eventsData, 'targetUid', 'targetUser');
+    const eids = await db.getSortedSetRevRangeByScore(
+        `events:time${filter ? `:${filter}` : ''}`,
+        start,
+        stop - start + 1,
+        to,
+        from
+    )
+    let eventsData = await db.getObjects(eids.map((eid) => `event:${eid}`))
+    eventsData = eventsData.filter(Boolean)
+    await addUserData(eventsData, 'uid', 'user')
+    await addUserData(eventsData, 'targetUid', 'targetUser')
     eventsData.forEach((event) => {
         Object.keys(event).forEach((key) => {
             if (typeof event[key] === 'string') {
-                event[key] = validator.escape(String(event[key] || ''));
+                event[key] = validator.escape(String(event[key] || ''))
             }
-        });
-        const e = utils.merge(event);
-        e.eid = undefined;
-        e.uid = undefined;
-        e.type = undefined;
-        e.ip = undefined;
-        e.user = undefined;
-        event.jsonString = JSON.stringify(e, null, 4);
-        event.timestampISO = new Date(parseInt(event.timestamp, 10)).toUTCString();
-    });
-    return eventsData;
-};
+        })
+        const e = utils.merge(event)
+        e.eid = undefined
+        e.uid = undefined
+        e.type = undefined
+        e.ip = undefined
+        e.user = undefined
+        event.jsonString = JSON.stringify(e, null, 4)
+        event.timestampISO = new Date(
+            parseInt(event.timestamp, 10)
+        ).toUTCString()
+    })
+    return eventsData
+}
 
 async function addUserData(eventsData, field, objectName) {
-    const uids = _.uniq(eventsData.map(event => event && event[field]));
+    const uids = _.uniq(eventsData.map((event) => event && event[field]))
 
     if (!uids.length) {
-        return eventsData;
+        return eventsData
     }
 
     const [isAdmin, userData] = await Promise.all([
         user.isAdministrator(uids),
         user.getUsersFields(uids, ['username', 'userslug', 'picture']),
-    ]);
+    ])
 
-    const map = {};
+    const map = {}
     userData.forEach((user, index) => {
-        user.isAdmin = isAdmin[index];
-        map[user.uid] = user;
-    });
+        user.isAdmin = isAdmin[index]
+        map[user.uid] = user
+    })
 
     eventsData.forEach((event) => {
         if (map[event[field]]) {
-            event[objectName] = map[event[field]];
+            event[objectName] = map[event[field]]
         }
-    });
-    return eventsData;
+    })
+    return eventsData
 }
 
 events.deleteEvents = async function (eids) {
-    const keys = eids.map(eid => `event:${eid}`);
-    const eventData = await db.getObjectsFields(keys, ['type']);
-    const sets = _.uniq(['events:time'].concat(eventData.map(e => `events:time:${e.type}`)));
-    await Promise.all([
-        db.deleteAll(keys),
-        db.sortedSetRemove(sets, eids),
-    ]);
-};
+    const keys = eids.map((eid) => `event:${eid}`)
+    const eventData = await db.getObjectsFields(keys, ['type'])
+    const sets = _.uniq(
+        ['events:time'].concat(eventData.map((e) => `events:time:${e.type}`))
+    )
+    await Promise.all([db.deleteAll(keys), db.sortedSetRemove(sets, eids)])
+}
 
 events.deleteAll = async function () {
-    await batch.processSortedSet('events:time', async (eids) => {
-        await events.deleteEvents(eids);
-    }, { alwaysStartAt: 0, batch: 500 });
-};
+    await batch.processSortedSet(
+        'events:time',
+        async (eids) => {
+            await events.deleteEvents(eids)
+        },
+        { alwaysStartAt: 0, batch: 500 }
+    )
+}
 
-require('./promisify')(events);
+require('./promisify')(events)
