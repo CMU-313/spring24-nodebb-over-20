@@ -1,48 +1,48 @@
 'use strict'
 
 define('admin/advanced/events', ['bootbox', 'alerts'], function (
-    bootbox,
-    alerts
+  bootbox,
+  alerts
 ) {
-    const Events = {}
+  const Events = {}
 
-    Events.init = function () {
-        $('[data-action="clear"]').on('click', function () {
-            bootbox.confirm(
-                '[[admin/advanced/events:confirm-delete-all-events]]',
-                (confirm) => {
-                    if (confirm) {
-                        socket.emit('admin.deleteAllEvents', function (err) {
-                            if (err) {
-                                return alerts.error(err)
-                            }
-                            $('.events-list').empty()
-                        })
-                    }
-                }
-            )
-        })
-
-        $('.delete-event').on('click', function () {
-            const $parentEl = $(this).parents('[data-eid]')
-            const eid = $parentEl.attr('data-eid')
-            socket.emit('admin.deleteEvents', [eid], function (err) {
-                if (err) {
-                    return alerts.error(err)
-                }
-                $parentEl.remove()
+  Events.init = function () {
+    $('[data-action="clear"]').on('click', function () {
+      bootbox.confirm(
+        '[[admin/advanced/events:confirm-delete-all-events]]',
+        (confirm) => {
+          if (confirm) {
+            socket.emit('admin.deleteAllEvents', function (err) {
+              if (err) {
+                return alerts.error(err)
+              }
+              $('.events-list').empty()
             })
-        })
+          }
+        }
+      )
+    })
 
-        $('#apply').on('click', Events.refresh)
-    }
+    $('.delete-event').on('click', function () {
+      const $parentEl = $(this).parents('[data-eid]')
+      const eid = $parentEl.attr('data-eid')
+      socket.emit('admin.deleteEvents', [eid], function (err) {
+        if (err) {
+          return alerts.error(err)
+        }
+        $parentEl.remove()
+      })
+    })
 
-    Events.refresh = function (event) {
-        event.preventDefault()
+    $('#apply').on('click', Events.refresh)
+  }
 
-        const $formEl = $('#filters')
-        ajaxify.go('admin/advanced/events?' + $formEl.serialize())
-    }
+  Events.refresh = function (event) {
+    event.preventDefault()
 
-    return Events
+    const $formEl = $('#filters')
+    ajaxify.go('admin/advanced/events?' + $formEl.serialize())
+  }
+
+  return Events
 })

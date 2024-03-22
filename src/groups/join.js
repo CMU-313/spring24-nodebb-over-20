@@ -8,138 +8,138 @@ const plugins = require('../plugins')
 const cache = require('../cache')
 
 module.exports = function (Groups) {
-    Groups.join = async function (groupNames, uid) {
-        if (!groupNames) {
-            throw new Error('[[error:invalid-data]]')
-        }
-        if (Array.isArray(groupNames) && !groupNames.length) {
-            return
-        }
-        if (!Array.isArray(groupNames)) {
-            groupNames = [groupNames]
-        }
+  Groups.join = async function (groupNames, uid) {
+    if (!groupNames) {
+      throw new Error('[[error:invalid-data]]')
+    }
+    if (Array.isArray(groupNames) && !groupNames.length) {
+      return
+    }
+    if (!Array.isArray(groupNames)) {
+      groupNames = [groupNames]
+    }
 
-        if (!uid) {
-            throw new Error('[[error:invalid-uid]]')
-        }
+    if (!uid) {
+      throw new Error('[[error:invalid-uid]]')
+    }
 
-        const [isMembers, exists, isAdmin] = await Promise.all([
-            Groups.isMemberOfGroups(uid, groupNames),
-            Groups.exists(groupNames),
-            user.isAdministrator(uid),
-        ])
+    const [isMembers, exists, isAdmin] = await Promise.all([
+      Groups.isMemberOfGroups(uid, groupNames),
+      Groups.exists(groupNames),
+      user.isAdministrator(uid)
+    ])
 
-        const groupsToCreate = groupNames.filter(
-            (groupName, index) => groupName && !exists[index]
+    const groupsToCreate = groupNames.filter(
+      (groupName, index) => groupName && !exists[index]
+    )
+    const groupsToJoin = groupNames.filter(
+      (groupName, index) => !isMembers[index]
+    )
+
+    if (!groupsToJoin.length) {
+      return
+    }
+    await createNonExistingGroups(groupsToCreate)
+
+    const promises = [
+      db.sortedSetsAdd(
+        groupsToJoin.map((groupName) => `group:${groupName}:members`),
+        Date.now(),
+        uid
+      ),
+      db.incrObjectField(
+        groupsToJoin.map((groupName) => `group:${groupName}`),
+        'memberCount'
+      )
+    ]
+    if (isAdmin) {
+      promises.push(
+        db.setsAdd(
+          groupsToJoin.map(
+            (groupName) => `group:${groupName}:owners`
+          ),
+          uid
         )
-        const groupsToJoin = groupNames.filter(
-            (groupName, index) => !isMembers[index]
-        )
+      )
+    }
 
-        if (!groupsToJoin.length) {
-            return
-        }
-        await createNonExistingGroups(groupsToCreate)
+    await Promise.all(promises)
 
-        const promises = [
-            db.sortedSetsAdd(
-                groupsToJoin.map((groupName) => `group:${groupName}:members`),
-                Date.now(),
-                uid
-            ),
-            db.incrObjectField(
-                groupsToJoin.map((groupName) => `group:${groupName}`),
-                'memberCount'
-            ),
-        ]
-        if (isAdmin) {
-            promises.push(
-                db.setsAdd(
-                    groupsToJoin.map(
-                        (groupName) => `group:${groupName}:owners`
-                    ),
-                    uid
-                )
-            )
-        }
+    Groups.clearCache(uid, groupsToJoin)
+    cache.del(groupsToJoin.map((name) => `group:${name}:members`))
 
-        await Promise.all(promises)
+    const groupData = await Groups.getGroupsFields(groupsToJoin, [
+      'name',
+      'hidden',
+      'memberCount'
+    ])
+    const visibleGroups = groupData.filter(
+      (groupData) => groupData && !groupData.hidden
+    )
 
-        Groups.clearCache(uid, groupsToJoin)
-        cache.del(groupsToJoin.map((name) => `group:${name}:members`))
+    if (visibleGroups.length) {
+      await db.sortedSetAdd(
+        'groups:visible:memberCount',
+        visibleGroups.map((groupData) => groupData.memberCount),
+        visibleGroups.map((groupData) => groupData.name)
+      )
+    }
 
-        const groupData = await Groups.getGroupsFields(groupsToJoin, [
-            'name',
-            'hidden',
-            'memberCount',
-        ])
-        const visibleGroups = groupData.filter(
-            (groupData) => groupData && !groupData.hidden
-        )
+    await setGroupTitleIfNotSet(groupsToJoin, uid)
 
-        if (visibleGroups.length) {
-            await db.sortedSetAdd(
-                'groups:visible:memberCount',
-                visibleGroups.map((groupData) => groupData.memberCount),
-                visibleGroups.map((groupData) => groupData.name)
-            )
-        }
+    plugins.hooks.fire('action:group.join', {
+      groupNames: groupsToJoin,
+      uid
+    })
+  }
 
-        await setGroupTitleIfNotSet(groupsToJoin, uid)
+  async function createNonExistingGroups (groupsToCreate) {
+    if (!groupsToCreate.length) {
+      return
+    }
 
-        plugins.hooks.fire('action:group.join', {
-            groupNames: groupsToJoin,
-            uid: uid,
+    for (const groupName of groupsToCreate) {
+      try {
+        // eslint-disable-next-line no-await-in-loop
+        await Groups.create({
+          name: groupName,
+          hidden: 1
         })
-    }
-
-    async function createNonExistingGroups(groupsToCreate) {
-        if (!groupsToCreate.length) {
-            return
-        }
-
-        for (const groupName of groupsToCreate) {
-            try {
-                // eslint-disable-next-line no-await-in-loop
-                await Groups.create({
-                    name: groupName,
-                    hidden: 1,
-                })
-            } catch (err) {
-                if (err && err.message !== '[[error:group-already-exists]]') {
-                    winston.error(
+      } catch (err) {
+        if (err && err.message !== '[[error:group-already-exists]]') {
+          winston.error(
                         `[groups.join] Could not create new hidden group (${groupName})\n${err.stack}`
-                    )
-                    throw err
-                }
-            }
+          )
+          throw err
         }
+      }
+    }
+  }
+
+  async function setGroupTitleIfNotSet (groupNames, uid) {
+    const ignore = [
+      'registered-users',
+      'verified-users',
+      'unverified-users',
+      Groups.BANNED_USERS
+    ]
+    groupNames = groupNames.filter(
+      (groupName) =>
+        !ignore.includes(groupName) &&
+                !Groups.isPrivilegeGroup(groupName)
+    )
+    if (!groupNames.length) {
+      return
     }
 
-    async function setGroupTitleIfNotSet(groupNames, uid) {
-        const ignore = [
-            'registered-users',
-            'verified-users',
-            'unverified-users',
-            Groups.BANNED_USERS,
-        ]
-        groupNames = groupNames.filter(
-            (groupName) =>
-                !ignore.includes(groupName) &&
-                !Groups.isPrivilegeGroup(groupName)
-        )
-        if (!groupNames.length) {
-            return
-        }
-
-        const currentTitle = await db.getObjectField(
+    const currentTitle = await db.getObjectField(
             `user:${uid}`,
             'groupTitle'
-        )
-        if (currentTitle || currentTitle === '') {
-            return
-        }
-
-        await user.setUserField(uid, 'groupTitle', JSON.stringify(groupNames))
+    )
+    if (currentTitle || currentTitle === '') {
+      return
     }
+
+    await user.setUserField(uid, 'groupTitle', JSON.stringify(groupNames))
+  }
 }
