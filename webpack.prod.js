@@ -7,15 +7,15 @@ const ProgressPlugin = require('progress-webpack-plugin')
 const common = require('./webpack.common')
 
 module.exports = merge(common, {
-    mode: 'production',
-    plugins: [new ProgressPlugin(true)],
-    optimization: {
-        minimize: true,
-        minimizer: [
-            new TerserPlugin({
-                minify: TerserPlugin.esbuildMinify,
-                terserOptions: {},
-            }),
-        ],
-    },
+  mode: 'production',
+  plugins: [new ProgressPlugin(true)],
+  optimization: {
+    minimize: true,
+    minimizer: [
+      new TerserPlugin({
+        minify: TerserPlugin.esbuildMinify,
+        terserOptions: {}
+      })
+    ]
+  }
 })

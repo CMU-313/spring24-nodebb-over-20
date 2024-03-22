@@ -8,33 +8,33 @@ const routeHelpers = require('../helpers')
 const { setupApiRoute } = routeHelpers
 
 module.exports = function () {
-    const middlewares = [
-        middleware.ensureLoggedIn,
-        middleware.admin.checkPrivileges,
-    ]
+  const middlewares = [
+    middleware.ensureLoggedIn,
+    middleware.admin.checkPrivileges
+  ]
 
-    setupApiRoute(
-        router,
-        'put',
-        '/settings/:setting',
-        [...middlewares, middleware.checkRequired.bind(null, ['value'])],
-        controllers.write.admin.updateSetting
-    )
+  setupApiRoute(
+    router,
+    'put',
+    '/settings/:setting',
+    [...middlewares, middleware.checkRequired.bind(null, ['value'])],
+    controllers.write.admin.updateSetting
+  )
 
-    setupApiRoute(
-        router,
-        'get',
-        '/analytics',
-        [...middlewares],
-        controllers.write.admin.getAnalyticsKeys
-    )
-    setupApiRoute(
-        router,
-        'get',
-        '/analytics/:set',
-        [...middlewares],
-        controllers.write.admin.getAnalyticsData
-    )
+  setupApiRoute(
+    router,
+    'get',
+    '/analytics',
+    [...middlewares],
+    controllers.write.admin.getAnalyticsKeys
+  )
+  setupApiRoute(
+    router,
+    'get',
+    '/analytics/:set',
+    [...middlewares],
+    controllers.write.admin.getAnalyticsData
+  )
 
-    return router
+  return router
 }
