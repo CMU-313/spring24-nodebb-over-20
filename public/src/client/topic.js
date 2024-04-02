@@ -72,32 +72,52 @@ define('forum/topic', [
       infinitescroll.init($('[component="topic"]'), posts.loadMorePosts)
     }
 
-    addBlockQuoteHandler()
-    addParentHandler()
-    addDropupHandler()
-    addRepliesHandler()
-    addPostsPreviewHandler()
+        addBlockQuoteHandler();
+        addParentHandler();
+        addDropupHandler();
+        addRepliesHandler();
+        addPostsPreviewHandler();
 
-    handleBookmark(tid)
+        handleBookmark(tid);
 
-    $(window).on('scroll', utils.debounce(updateTopicTitle, 250))
+        $(window).on('scroll', utils.debounce(updateTopicTitle, 250));
+        configurePostToggle();
 
-    handleTopicSearch()
+        handleTopicSearch();
+        hooks.fire('action:topic.loaded', ajaxify.data);
+    };
 
-    hooks.fire('action:topic.loaded', ajaxify.data)
-  }
+    function configurePostToggle() {
+        $(".topic").on("click", ".view-original-btn", function () {
+            console.log("clicked");
+            console.log(this);
+            // Toggle the visibility of the next .original-content div
+            $(this).closest('.sensitive-content-message').next('.original-content').toggle();
 
-  function handleTopicSearch () {
-    require(['mousetrap'], (mousetrap) => {
-      if (config.topicSearchEnabled) {
-        require(['search'], function (search) {
-          mousetrap.bind(['command+f', 'ctrl+f'], function (e) {
-            e.preventDefault()
-            $('#search-fields input').val(
-              'in:topic-' + ajaxify.data.tid + ' '
-            )
-            search.showAndFocusInput()
-          })
+            console.log($(this).closest('.sensitive-content-message').next('.original-content'));
+            // Optionally, change the button text based on visibility
+            var isVisible = $(this).closest('.sensitive-content-message').next('.original-content').is(':visible');
+            if (isVisible) {
+                $(this).text('Hide the translated message.');
+            } else {
+                $(this).text('Click here to view the translated message.');
+            }
+        });
+    }
+
+
+
+
+
+    function handleTopicSearch() {
+        require(['mousetrap'], (mousetrap) => {
+            if (config.topicSearchEnabled) {
+                require(['search'], function (search) {
+                    mousetrap.bind(['command+f', 'ctrl+f'], function (e) {
+                        e.preventDefault();
+                        $('#search-fields input').val('in:topic-' + ajaxify.data.tid + ' ');
+                        search.showAndFocusInput();
+                    });
 
           hooks.onPage('action:ajaxify.cleanup', () => {
             mousetrap.unbind(['command+f', 'ctrl+f'])
