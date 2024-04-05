@@ -1,15 +1,15 @@
 'use strict'
 
 define('forum/tag', ['topicList', 'forum/infinitescroll'], function (
-  topicList
+    topicList
 ) {
-  const Tag = {}
+    const Tag = {}
 
-  Tag.init = function () {
-    app.enterRoom('tags')
+    Tag.init = function () {
+        app.enterRoom('tags')
 
-    topicList.init('tag')
-  }
+        topicList.init('tag')
+    }
 
-  return Tag
+    return Tag
 })

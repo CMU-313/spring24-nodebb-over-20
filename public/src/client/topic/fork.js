@@ -1,133 +1,133 @@
 'use strict'
 
 define('forum/topic/fork', ['components', 'postSelect', 'alerts'], function (
-  components,
-  postSelect,
-  alerts
+    components,
+    postSelect,
+    alerts
 ) {
-  const Fork = {}
-  let forkModal
-  let forkCommit
-  let fromTid
+    const Fork = {}
+    let forkModal
+    let forkCommit
+    let fromTid
 
-  Fork.init = function () {
-    fromTid = ajaxify.data.tid
+    Fork.init = function () {
+        fromTid = ajaxify.data.tid
 
-    $(window)
-      .off('action:ajaxify.end', onAjaxifyEnd)
-      .on('action:ajaxify.end', onAjaxifyEnd)
+        $(window)
+            .off('action:ajaxify.end', onAjaxifyEnd)
+            .on('action:ajaxify.end', onAjaxifyEnd)
 
-    if (forkModal) {
-      return
-    }
-
-    app.parseAndTranslate(
-      'partials/fork_thread_modal',
-      {},
-      function (html) {
-        forkModal = html
-
-        forkCommit = forkModal.find('#fork_thread_commit')
-
-        $('body').append(forkModal)
-
-        forkModal
-          .find('.close,#fork_thread_cancel')
-          .on('click', closeForkModal)
-        forkModal.find('#fork-title').on('keyup', checkForkButtonEnable)
-
-        postSelect.init(function () {
-          checkForkButtonEnable()
-          showPostsSelected()
-        })
-        showPostsSelected()
-
-        forkCommit.on('click', createTopicFromPosts)
-      }
-    )
-  }
-
-  function onAjaxifyEnd () {
-    if (
-      ajaxify.data.template.name !== 'topic' ||
-            ajaxify.data.tid !== fromTid
-    ) {
-      closeForkModal()
-      $(window).off('action:ajaxify.end', onAjaxifyEnd)
-    }
-  }
-
-  function createTopicFromPosts () {
-    forkCommit.attr('disabled', true)
-    socket.emit(
-      'topics.createTopicFromPosts',
-      {
-        title: forkModal.find('#fork-title').val(),
-        pids: postSelect.pids,
-        fromTid
-      },
-      function (err, newTopic) {
-        function fadeOutAndRemove (pid) {
-          components
-            .get('post', 'pid', pid)
-            .fadeOut(500, function () {
-              $(this).remove()
-            })
-        }
-        forkCommit.removeAttr('disabled')
-        if (err) {
-          return alerts.error(err.message)
+        if (forkModal) {
+            return
         }
 
-        alerts.alert({
-          timeout: 5000,
-          title: '[[global:alert.success]]',
-          message: '[[topic:fork_success]]',
-          type: 'success',
-          clickfn: function () {
-            ajaxify.go('topic/' + newTopic.slug)
-          }
-        })
+        app.parseAndTranslate(
+            'partials/fork_thread_modal',
+            {},
+            function (html) {
+                forkModal = html
 
-        postSelect.pids.forEach(function (pid) {
-          fadeOutAndRemove(pid)
-        })
+                forkCommit = forkModal.find('#fork_thread_commit')
 
-        closeForkModal()
-      }
-    )
-  }
+                $('body').append(forkModal)
 
-  function showPostsSelected () {
-    if (postSelect.pids.length) {
-      forkModal
-        .find('#fork-pids')
-        .translateHtml(
-          '[[topic:fork_pid_count, ' + postSelect.pids.length + ']]'
+                forkModal
+                    .find('.close,#fork_thread_cancel')
+                    .on('click', closeForkModal)
+                forkModal.find('#fork-title').on('keyup', checkForkButtonEnable)
+
+                postSelect.init(function () {
+                    checkForkButtonEnable()
+                    showPostsSelected()
+                })
+                showPostsSelected()
+
+                forkCommit.on('click', createTopicFromPosts)
+            }
         )
-    } else {
-      forkModal.find('#fork-pids').translateHtml('[[topic:fork_no_pids]]')
     }
-  }
 
-  function checkForkButtonEnable () {
-    if (
-      forkModal.find('#fork-title').val().length &&
+    function onAjaxifyEnd() {
+        if (
+            ajaxify.data.template.name !== 'topic' ||
+            ajaxify.data.tid !== fromTid
+        ) {
+            closeForkModal()
+            $(window).off('action:ajaxify.end', onAjaxifyEnd)
+        }
+    }
+
+    function createTopicFromPosts() {
+        forkCommit.attr('disabled', true)
+        socket.emit(
+            'topics.createTopicFromPosts',
+            {
+                title: forkModal.find('#fork-title').val(),
+                pids: postSelect.pids,
+                fromTid,
+            },
+            function (err, newTopic) {
+                function fadeOutAndRemove(pid) {
+                    components
+                        .get('post', 'pid', pid)
+                        .fadeOut(500, function () {
+                            $(this).remove()
+                        })
+                }
+                forkCommit.removeAttr('disabled')
+                if (err) {
+                    return alerts.error(err.message)
+                }
+
+                alerts.alert({
+                    timeout: 5000,
+                    title: '[[global:alert.success]]',
+                    message: '[[topic:fork_success]]',
+                    type: 'success',
+                    clickfn: function () {
+                        ajaxify.go('topic/' + newTopic.slug)
+                    },
+                })
+
+                postSelect.pids.forEach(function (pid) {
+                    fadeOutAndRemove(pid)
+                })
+
+                closeForkModal()
+            }
+        )
+    }
+
+    function showPostsSelected() {
+        if (postSelect.pids.length) {
+            forkModal
+                .find('#fork-pids')
+                .translateHtml(
+                    '[[topic:fork_pid_count, ' + postSelect.pids.length + ']]'
+                )
+        } else {
+            forkModal.find('#fork-pids').translateHtml('[[topic:fork_no_pids]]')
+        }
+    }
+
+    function checkForkButtonEnable() {
+        if (
+            forkModal.find('#fork-title').val().length &&
             postSelect.pids.length
-    ) {
-      forkCommit.removeAttr('disabled')
-    } else {
-      forkCommit.attr('disabled', true)
+        ) {
+            forkCommit.removeAttr('disabled')
+        } else {
+            forkCommit.attr('disabled', true)
+        }
     }
-  }
 
-  function closeForkModal () {
-    if (forkModal) {
-      forkModal.remove()
-      forkModal = null
-      postSelect.disable()
+    function closeForkModal() {
+        if (forkModal) {
+            forkModal.remove()
+            forkModal = null
+            postSelect.disable()
+        }
     }
-  }
 
-  return Fork
+    return Fork
 })

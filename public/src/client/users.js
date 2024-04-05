@@ -1,123 +1,151 @@
 'use strict'
 
 define('forum/users', [
-  'translator', 'benchpress', 'api', 'alerts', 'accounts/invite'
+    'translator',
+    'benchpress',
+    'api',
+    'alerts',
+    'accounts/invite',
 ], function (translator, Benchpress, api, alerts, AccountInvite) {
-  const Users = {}
+    const Users = {}
 
-  let searchResultCount = 0
+    let searchResultCount = 0
 
-  Users.init = function () {
-    app.enterRoom('user_list')
-    console.log('Entered Users.js file')
+    Users.init = function () {
+        app.enterRoom('user_list')
+        console.log('Entered Users.js file')
 
-    const section = utils.param('section') ? ('?section=' + utils.param('section')) : ''
-    $('.nav-pills li').removeClass('active').find('a[href="' + window.location.pathname + section + '"]').parent()
-      .addClass('active')
+        const section = utils.param('section')
+            ? '?section=' + utils.param('section')
+            : ''
+        $('.nav-pills li')
+            .removeClass('active')
+            .find('a[href="' + window.location.pathname + section + '"]')
+            .parent()
+            .addClass('active')
 
-    Users.handleSearch()
+        Users.handleSearch()
 
-    AccountInvite.handle()
+        AccountInvite.handle()
 
-    socket.removeListener('event:user_status_change', onUserStatusChange)
-    socket.on('event:user_status_change', onUserStatusChange)
-  }
-
-  Users.handleSearch = function (params) {
-    searchResultCount = params && params.resultCount
-    $('#search-user').on('keyup', utils.debounce(doSearch, 250))
-    $('.search select, .search input[type="checkbox"]').on('change', doSearch)
-  }
-
-  function doSearch () {
-    if (!ajaxify.data.template.users) {
-      return
-    }
-    console.log('Doing search')
-    $('[component="user/search/icon"]').removeClass('fa-search').addClass('fa-spinner fa-spin')
-    const username = $('#search-user').val()
-    const activeSection = getActiveSection()
-    console.log(username)
-
-    const query = {
-      section: activeSection,
-      page: 1
+        socket.removeListener('event:user_status_change', onUserStatusChange)
+        socket.on('event:user_status_change', onUserStatusChange)
     }
 
-    if (!username) {
-      return loadPage(query)
+    Users.handleSearch = function (params) {
+        searchResultCount = params && params.resultCount
+        $('#search-user').on('keyup', utils.debounce(doSearch, 250))
+        $('.search select, .search input[type="checkbox"]').on(
+            'change',
+            doSearch
+        )
     }
 
-    query.query = username
-    query.sortBy = getSortBy()
-    const filters = []
-    if ($('.search .online-only').is(':checked') || (activeSection === 'online')) {
-      filters.push('online')
-    }
-    if (activeSection === 'banned') {
-      filters.push('banned')
-    }
-    if (activeSection === 'flagged') {
-      filters.push('flagged')
-    }
-    if (filters.length) {
-      query.filters = filters
-    }
+    function doSearch() {
+        if (!ajaxify.data.template.users) {
+            return
+        }
+        console.log('Doing search')
+        $('[component="user/search/icon"]')
+            .removeClass('fa-search')
+            .addClass('fa-spinner fa-spin')
+        const username = $('#search-user').val()
+        const activeSection = getActiveSection()
+        console.log(username)
 
-    loadPage(query)
-  }
+        const query = {
+            section: activeSection,
+            page: 1,
+        }
 
-  function getSortBy () {
-    let sortBy
-    const activeSection = getActiveSection()
-    if (activeSection === 'sort-posts') {
-      sortBy = 'postcount'
-    } else if (activeSection === 'sort-reputation') {
-      sortBy = 'reputation'
-    } else if (activeSection === 'users') {
-      sortBy = 'joindate'
-    }
-    return sortBy
-  }
+        if (!username) {
+            return loadPage(query)
+        }
 
-  function loadPage (query) {
-    api.get('/api/users', query)
-      .then(renderSearchResults)
-      .catch(alerts.error)
-  }
+        query.query = username
+        query.sortBy = getSortBy()
+        const filters = []
+        if (
+            $('.search .online-only').is(':checked') ||
+            activeSection === 'online'
+        ) {
+            filters.push('online')
+        }
+        if (activeSection === 'banned') {
+            filters.push('banned')
+        }
+        if (activeSection === 'flagged') {
+            filters.push('flagged')
+        }
+        if (filters.length) {
+            query.filters = filters
+        }
 
-  function renderSearchResults (data) {
-    Benchpress.render('partials/paginator', { pagination: data.pagination }).then(function (html) {
-      $('.pagination-container').replaceWith(html)
-    })
-
-    if (searchResultCount) {
-      data.users = data.users.slice(0, searchResultCount)
+        loadPage(query)
     }
 
-    data.isAdminOrGlobalMod = app.user.isAdmin || app.user.isGlobalMod
-    app.parseAndTranslate('users', 'users', data, function (html) {
-      $('#users-container').html(html)
-      html.find('span.timeago').timeago()
-      $('[component="user/search/icon"]').addClass('fa-search').removeClass('fa-spinner fa-spin')
-    })
-  }
-
-  function onUserStatusChange (data) {
-    const section = getActiveSection()
-
-    if ((section.startsWith('online') || section.startsWith('users'))) {
-      updateUser(data)
+    function getSortBy() {
+        let sortBy
+        const activeSection = getActiveSection()
+        if (activeSection === 'sort-posts') {
+            sortBy = 'postcount'
+        } else if (activeSection === 'sort-reputation') {
+            sortBy = 'reputation'
+        } else if (activeSection === 'users') {
+            sortBy = 'joindate'
+        }
+        return sortBy
     }
-  }
 
-  function updateUser (data) {
-    app.updateUserStatus($('#users-container [data-uid="' + data.uid + '"] [component="user/status"]'), data.status)
-  }
+    function loadPage(query) {
+        api.get('/api/users', query)
+            .then(renderSearchResults)
+            .catch(alerts.error)
+    }
 
-  function getActiveSection () {
-    return utils.param('section') || ''
-  }
+    function renderSearchResults(data) {
+        Benchpress.render('partials/paginator', {
+            pagination: data.pagination,
+        }).then(function (html) {
+            $('.pagination-container').replaceWith(html)
+        })
 
-  return Users
+        if (searchResultCount) {
+            data.users = data.users.slice(0, searchResultCount)
+        }
+
+        data.isAdminOrGlobalMod = app.user.isAdmin || app.user.isGlobalMod
+        app.parseAndTranslate('users', 'users', data, function (html) {
+            $('#users-container').html(html)
+            html.find('span.timeago').timeago()
+            $('[component="user/search/icon"]')
+                .addClass('fa-search')
+                .removeClass('fa-spinner fa-spin')
+        })
+    }
+
+    function onUserStatusChange(data) {
+        const section = getActiveSection()
+
+        if (section.startsWith('online') || section.startsWith('users')) {
+            updateUser(data)
+        }
+    }
+
+    function updateUser(data) {
+        app.updateUserStatus(
+            $(
+                '#users-container [data-uid="' +
+                    data.uid +
+                    '"] [component="user/status"]'
+            ),
+            data.status
+        )
+    }
+
+    function getActiveSection() {
+        return utils.param('section') || ''
+    }
+
+    return Users
 })

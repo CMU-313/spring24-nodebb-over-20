@@ -3,7 +3,7 @@
 const nconf = require('nconf')
 
 nconf.argv().env({
-  separator: '__'
+    separator: '__',
 })
 
 const fs = require('fs')
@@ -15,9 +15,9 @@ process.env.NODE_ENV = process.env.NODE_ENV || 'production'
 
 // Alternate configuration file support
 const configFile = path.resolve(
-  __dirname,
-  '../../../',
-  nconf.any(['config', 'CONFIG']) || 'config.json'
+    __dirname,
+    '../../../',
+    nconf.any(['config', 'CONFIG']) || 'config.json'
 )
 const prestart = require('../../prestart')
 
@@ -27,85 +27,85 @@ prestart.setupWinston()
 const db = require('../../database')
 
 process.on('message', async (msg) => {
-  if (msg && msg.uid) {
-    await db.init()
+    if (msg && msg.uid) {
+        await db.init()
 
-    const targetUid = msg.uid
+        const targetUid = msg.uid
 
-    const archivePath = path.join(
-      __dirname,
-      '../../../build/export',
+        const archivePath = path.join(
+            __dirname,
+            '../../../build/export',
             `${targetUid}_uploads.zip`
-    )
-    const rootDirectory = path.join(__dirname, '../../../public/uploads/')
+        )
+        const rootDirectory = path.join(__dirname, '../../../public/uploads/')
 
-    const user = require('../index')
+        const user = require('../index')
 
-    const archive = archiver('zip', {
-      zlib: { level: 9 } // Sets the compression level.
-    })
+        const archive = archiver('zip', {
+            zlib: { level: 9 }, // Sets the compression level.
+        })
 
-    archive.on('warning', (err) => {
-      switch (err.code) {
-        case 'ENOENT':
-          winston.warn(
+        archive.on('warning', (err) => {
+            switch (err.code) {
+                case 'ENOENT':
+                    winston.warn(
                         `[user/export/uploads] File not found: ${err.path}`
-          )
-          break
+                    )
+                    break
 
-        default:
-          winston.warn(
+                default:
+                    winston.warn(
                         `[user/export/uploads] Unexpected warning: ${err.message}`
-          )
-          break
-      }
-    })
+                    )
+                    break
+            }
+        })
 
-    archive.on('error', (err) => {
-      const trimPath = function (path) {
-        return path.replace(rootDirectory, '')
-      }
-      switch (err.code) {
-        case 'EACCES':
-          winston.error(
+        archive.on('error', (err) => {
+            const trimPath = function (path) {
+                return path.replace(rootDirectory, '')
+            }
+            switch (err.code) {
+                case 'EACCES':
+                    winston.error(
                         `[user/export/uploads] File inaccessible: ${trimPath(err.path)}`
-          )
-          break
+                    )
+                    break
 
-        default:
-          winston.error(
+                default:
+                    winston.error(
                         `[user/export/uploads] Unable to construct archive: ${err.message}`
-          )
-          break
-      }
-    })
+                    )
+                    break
+            }
+        })
 
-    const output = fs.createWriteStream(archivePath)
-    output.on('close', async () => {
-      await db.close()
-      process.exit(0)
-    })
+        const output = fs.createWriteStream(archivePath)
+        output.on('close', async () => {
+            await db.close()
+            process.exit(0)
+        })
 
-    archive.pipe(output)
-    winston.verbose(
+        archive.pipe(output)
+        winston.verbose(
             `[user/export/uploads] Collating uploads for uid ${targetUid}`
-    )
-    await user.collateUploads(targetUid, archive)
+        )
+        await user.collateUploads(targetUid, archive)
 
-    const uploadedPicture = await user.getUserField(
-      targetUid,
-      'uploadedpicture'
-    )
-    if (uploadedPicture) {
-      const filePath = uploadedPicture.replace(
-        nconf.get('upload_url'),
-        ''
-      )
-      archive.file(path.join(nconf.get('upload_path'), filePath), {
-        name: path.basename(filePath)
-      })
+        const uploadedPicture = await user.getUserField(
+            targetUid,
+            'uploadedpicture'
+        )
+        if (uploadedPicture) {
+            const filePath = uploadedPicture.replace(
+                nconf.get('upload_url'),
+                ''
+            )
+            archive.file(path.join(nconf.get('upload_path'), filePath), {
+                name: path.basename(filePath),
+            })
+        }
+
+        archive.finalize()
     }
-
-    archive.finalize()
-  }
 })

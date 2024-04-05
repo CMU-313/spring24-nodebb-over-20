@@ -13,15 +13,15 @@ const nodeModules = path.join(baseDir, 'node_modules')
 const themes = path.join(baseDir, 'themes')
 
 exports.paths = {
-  baseDir,
-  loader,
-  app,
-  pidfile,
-  config,
-  currentPackage,
-  installPackage,
-  nodeModules,
-  themes
+    baseDir,
+    loader,
+    app,
+    pidfile,
+    config,
+    currentPackage,
+    installPackage,
+    nodeModules,
+    themes,
 }
 
 exports.pluginNamePattern =
