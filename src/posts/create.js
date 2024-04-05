@@ -2,26 +2,25 @@
 
 const _ = require('lodash')
 
-const meta = require('../meta');
-const db = require('../database');
-const plugins = require('../plugins');
-const user = require('../user');
-const topics = require('../topics');
-const categories = require('../categories');
-const groups = require('../groups');
-const utils = require('../utils');
-const translate = require('../translate');
+const meta = require('../meta')
+const db = require('../database')
+const plugins = require('../plugins')
+const user = require('../user')
+const topics = require('../topics')
+const categories = require('../categories')
+const groups = require('../groups')
+const utils = require('../utils')
 
 module.exports = function (Posts) {
-    Posts.create = async function (data) {
-        // This is an internal method, consider using Topics.reply instead
-        const { uid } = data;
-        const { tid } = data;
-        const { anonymous } = data
-        const content = data.content.toString();
-        const timestamp = data.timestamp || Date.now();
-        const isMain = data.isMain || false;
-        const [isEnglish, translatedContent] = await translate.translate(data)
+  Posts.create = async function (data) {
+    // This is an internal method, consider using Topics.reply instead
+    const { uid } = data
+    const { tid } = data
+    const { anonymous } = data
+
+    const content = data.content.toString()
+    const timestamp = data.timestamp || Date.now()
+    const isMain = data.isMain || false
 
     if (!uid && parseInt(uid, 10) !== 0) {
       throw new Error('[[error:invalid-uid]]')
@@ -31,20 +30,20 @@ module.exports = function (Posts) {
       throw new Error('[[error:invalid-pid]]')
     }
 
-        const pid = await db.incrObjectField('global', 'nextPid');
-        let postUID = uid
-        if (anonymous) {
-          postUID = 0
-        }
-        let postData = {
-            pid: pid,
-            uid: postUID,
-            tid: tid,
-            content: content,
-            timestamp: timestamp,
-            translatedContent: translatedContent,
-            isEnglish: isEnglish,
-        };
+    const pid = await db.incrObjectField('global', 'nextPid')
+
+    let postUID = uid
+    if (anonymous) {
+      postUID = 0
+    }
+
+    let postData = {
+      pid,
+      uid: postUID,
+      tid,
+      content,
+      timestamp
+    }
 
     if (data.toPid) {
       postData.toPid = data.toPid
