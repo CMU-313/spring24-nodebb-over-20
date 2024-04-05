@@ -79,5 +79,6 @@ function modifyPost(post, fields) {
             post.editedISO =
                 post.edited !== 0 ? utils.toISOString(post.edited) : ''
         }
+        post.isEnglish = post.isEnglish == "true";
     }
 }
