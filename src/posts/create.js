@@ -2,25 +2,25 @@
 
 const _ = require('lodash')
 
-const meta = require('../meta');
-const db = require('../database');
-const plugins = require('../plugins');
-const user = require('../user');
-const topics = require('../topics');
-const categories = require('../categories');
-const groups = require('../groups');
-const utils = require('../utils');
-const translate = require('../translate');
+const meta = require('../meta')
+const db = require('../database')
+const plugins = require('../plugins')
+const user = require('../user')
+const topics = require('../topics')
+const categories = require('../categories')
+const groups = require('../groups')
+const utils = require('../utils')
+const translate = require('../translate')
 
 module.exports = function (Posts) {
     Posts.create = async function (data) {
         // This is an internal method, consider using Topics.reply instead
-        const { uid } = data;
-        const { tid } = data;
+        const { uid } = data
+        const { tid } = data
         const { anonymous } = data
-        const content = data.content.toString();
-        const timestamp = data.timestamp || Date.now();
-        const isMain = data.isMain || false;
+        const content = data.content.toString()
+        const timestamp = data.timestamp || Date.now()
+        const isMain = data.isMain || false
         const [isEnglish, translatedContent] = await translate.translate(data)
 
         if (!uid && parseInt(uid, 10) !== 0) {
@@ -46,7 +46,7 @@ module.exports = function (Posts) {
             timestamp: timestamp,
             translatedContent: translatedContent,
             isEnglish: isEnglish,
-        };
+        }
 
         if (data.toPid) {
             postData.toPid = data.toPid
